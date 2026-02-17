@@ -1,0 +1,19 @@
+﻿Analyzing icuisine...                                           
+
+   info - Don't use 'BuildContext's across async gaps - lib\screens\customer\customer_login_page.dart:38:30 - use_build_context_synchronously
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\customer\customer_login_page.dart:70:42 - deprecated_member_use
+   info - Don't use 'BuildContext's across async gaps - lib\screens\customer\customer_signup_page.dart:53:30 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\screens\customer\customer_signup_page.dart:56:23 - use_build_context_synchronously
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\customer\customer_signup_page.dart:86:42 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\home_page.dart:85:60 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\home_page.dart:198:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\home_page.dart:199:53 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\home_page.dart:318:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\home_page.dart:321:26 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\home_page.dart:334:28 - deprecated_member_use
+   info - Don't use 'BuildContext's across async gaps - lib\screens\vendor\vendor_login_page.dart:38:30 - use_build_context_synchronously
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\vendor\vendor_login_page.dart:70:68 - deprecated_member_use
+   info - Don't use 'BuildContext's across async gaps - lib\screens\vendor\vendor_signup_page.dart:55:30 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\screens\vendor\vendor_signup_page.dart:58:23 - use_build_context_synchronously
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\vendor\vendor_signup_page.dart:88:68 - deprecated_member_use
+
