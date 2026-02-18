@@ -6,6 +6,14 @@ class NotificationPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? const Color(0xFF121212) : Colors.grey[50]!;
+    final surfaceColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[100]!;
+    final textColor = isDark ? Colors.white : Colors.black87;
+    final subtextColor = isDark ? Colors.white54 : Colors.black54;
+    final iconColor = isDark ? Colors.white10 : Colors.grey[300]!;
+    final borderColor = isDark ? Colors.white10 : Colors.grey[300]!;
+
     // Sample notifications
     final List<Map<String, String>> notifications = [
       {
@@ -23,28 +31,28 @@ class NotificationPage extends StatelessWidget {
     ];
 
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+      backgroundColor: backgroundColor,
       appBar: AppBar(
-        title: Text('Notifications', style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: Colors.white)),
-        backgroundColor: const Color(0xFF121212),
+        title: Text('Notifications', style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: textColor)),
+        backgroundColor: backgroundColor,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: textColor),
       ),
       body: notifications.isEmpty
           ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.notifications_none_outlined, size: 80, color: Colors.white10),
+                  Icon(Icons.notifications_none_outlined, size: 80, color: iconColor),
                   const SizedBox(height: 20),
                   Text(
                     'All clear!',
-                    style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+                    style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.bold, color: textColor),
                   ),
                   const SizedBox(height: 10),
                   Text(
                     'You have no new notifications.',
-                    style: GoogleFonts.outfit(color: Colors.white38),
+                    style: GoogleFonts.outfit(color: subtextColor),
                   ),
                 ],
               ),
@@ -58,9 +66,9 @@ class NotificationPage extends StatelessWidget {
                 return Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1E1E1E),
+                    color: surfaceColor,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white10),
+                    border: Border.all(color: borderColor),
                   ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,18 +97,18 @@ class NotificationPage extends StatelessWidget {
                               children: [
                                 Text(
                                   note['title']!,
-                                  style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                                  style: GoogleFonts.outfit(color: textColor, fontWeight: FontWeight.bold, fontSize: 16),
                                 ),
                                 Text(
                                   note['time']!,
-                                  style: GoogleFonts.outfit(color: Colors.white24, fontSize: 10),
+                                  style: GoogleFonts.outfit(color: subtextColor, fontSize: 10),
                                 ),
                               ],
                             ),
                             const SizedBox(height: 5),
                             Text(
                               note['message']!,
-                              style: GoogleFonts.outfit(color: Colors.white54, fontSize: 13, height: 1.4),
+                              style: GoogleFonts.outfit(color: subtextColor, fontSize: 13, height: 1.4),
                             ),
                           ],
                         ),

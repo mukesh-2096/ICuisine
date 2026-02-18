@@ -46,6 +46,12 @@ dependencies:
   crypto: ^3.0.7
   google_fonts: ^6.1.0
   intl: ^0.18.1
+  shared_preferences: ^2.2.2
+  provider: ^6.1.1
+  geolocator: ^13.0.2
+  url_launcher: ^6.3.1
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.1
 
 dev_dependencies:
   flutter_test:
@@ -62,9 +68,12 @@ dev_dependencies:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "images/logo.png"
-  adaptive_icon_background: "#FF6B35"
-  adaptive_icon_foreground: "images/logo.png"
+  image_path: "images/white_logo.png"
+  adaptive_icon_background: "#FA5211"
+  adaptive_icon_foreground: "images/white_logo.png"
+  min_sdk_android: 21
+  remove_alpha_ios: true
+  background_color_ios: "#FA5211"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -81,7 +90,8 @@ flutter:
   assets:
     - images/google-icon.svg
     - images/list-icon.svg
-    - images/logo.png
+    - images/white_logo.png
+    - images/orange_logo.png
     - .env
   #   - images/a_dot_ham.jpeg
 

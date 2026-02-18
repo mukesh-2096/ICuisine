@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../services/cart_service.dart';
+import 'cart_page.dart';
 
 class FoodItemDetailsPage extends StatefulWidget {
   final Map<String, dynamic> item;
@@ -58,6 +59,8 @@ class _FoodItemDetailsPageState extends State<FoodItemDetailsPage> {
         'image': widget.item['image'],
         'vendorId': widget.vendorId,
         'vendorName': widget.vendorName,
+        'itemType': widget.item['itemType'],
+        'preparationTime': widget.item['preparationTime'],
       };
 
       // Add the item multiple times based on quantity or update quantity logic using addToCart
@@ -113,7 +116,17 @@ class _FoodItemDetailsPageState extends State<FoodItemDetailsPage> {
           SnackBar(
             content: Text('${widget.item['name']} added to cart'),
             backgroundColor: Colors.green,
-            duration: const Duration(seconds: 1),
+            duration: const Duration(seconds: 2),
+            action: SnackBarAction(
+              label: 'View Cart',
+              textColor: Colors.white,
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const CartPage()),
+                );
+              },
+            ),
           ),
         );
         Navigator.pop(context);
@@ -131,21 +144,32 @@ class _FoodItemDetailsPageState extends State<FoodItemDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? const Color(0xFF121212) : Colors.grey[50]!;
+    final surfaceColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[100]!;
+    final textColor = isDark ? Colors.white : Colors.black87;
+    final subtextColor = isDark ? Colors.white70 : Colors.black54;
+    final iconBgColor = isDark ? Colors.black54 : Colors.white.withOpacity(0.7);
+    final iconColor = isDark ? Colors.white : Colors.black87;
+    final borderColor = isDark ? Colors.white10 : Colors.grey[300]!;
+    final imagePlaceholderColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[200]!;
+    final imagePlaceholderIconColor = isDark ? Colors.white24 : Colors.grey;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+      backgroundColor: backgroundColor,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
             expandedHeight: 300,
             pinned: true,
-            backgroundColor: const Color(0xFF121212),
+            backgroundColor: backgroundColor,
             flexibleSpace: FlexibleSpaceBar(
               background: Stack(
                 fit: StackFit.expand,
                 children: [
                   widget.item['image'] != null && widget.item['image'].toString().isNotEmpty
                       ? Image.network(widget.item['image'], fit: BoxFit.cover)
-                      : Container(color: const Color(0xFF1E1E1E), child: const Icon(Icons.fastfood, size: 80, color: Colors.white24)),
+                      : Container(color: imagePlaceholderColor, child: Icon(Icons.fastfood, size: 80, color: imagePlaceholderIconColor)),
                   Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
@@ -161,8 +185,8 @@ class _FoodItemDetailsPageState extends State<FoodItemDetailsPage> {
             leading: IconButton(
               icon: Container(
                 padding: const EdgeInsets.all(8),
-                decoration: const BoxDecoration(color: Colors.black54, shape: BoxShape.circle),
-                child: const Icon(Icons.arrow_back, color: Colors.white),
+                decoration: BoxDecoration(color: iconBgColor, shape: BoxShape.circle),
+                child: Icon(Icons.arrow_back, color: iconColor),
               ),
               onPressed: () => Navigator.pop(context),
             ),
@@ -178,9 +202,44 @@ class _FoodItemDetailsPageState extends State<FoodItemDetailsPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
-                        child: Text(
-                          widget.item['name'] ?? 'Unnamed Item',
-                          style: GoogleFonts.outfit(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Veg/Non-Veg Indicator
+                            if (widget.item['itemType'] != null)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 8),
+                                child: Container(
+                                  width: 22,
+                                  height: 22,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: widget.item['itemType'] == 'veg' 
+                                          ? Colors.green 
+                                          : Colors.red,
+                                      width: 2,
+                                    ),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Center(
+                                    child: Container(
+                                      width: 10,
+                                      height: 10,
+                                      decoration: BoxDecoration(
+                                        color: widget.item['itemType'] == 'veg' 
+                                            ? Colors.green 
+                                            : Colors.red,
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            Text(
+                              widget.item['name'] ?? 'Unnamed Item',
+                              style: GoogleFonts.outfit(color: textColor, fontSize: 28, fontWeight: FontWeight.bold),
+                            ),
+                          ],
                         ),
                       ),
                       Text(
@@ -194,15 +253,34 @@ class _FoodItemDetailsPageState extends State<FoodItemDetailsPage> {
                     widget.vendorName,
                     style: GoogleFonts.outfit(color: Colors.greenAccent, fontSize: 14, fontWeight: FontWeight.w500),
                   ),
+                  // Preparation Time
+                  if (widget.item['preparationTime'] != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 12),
+                      child: Row(
+                        children: [
+                          Icon(Icons.timer_outlined, color: const Color(0xFFFA5211), size: 18),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Ready in ${widget.item['preparationTime']} mins',
+                            style: GoogleFonts.outfit(
+                              color: subtextColor,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   const SizedBox(height: 20),
                   Text(
                     "Description",
-                    style: GoogleFonts.outfit(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                    style: GoogleFonts.outfit(color: textColor, fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     widget.item['description'] ?? 'No description available for this delicious item.',
-                    style: GoogleFonts.outfit(color: Colors.white70, fontSize: 14, height: 1.5),
+                    style: GoogleFonts.outfit(color: subtextColor, fontSize: 14, height: 1.5),
                   ),
                   const SizedBox(height: 30),
                   
@@ -238,9 +316,9 @@ class _FoodItemDetailsPageState extends State<FoodItemDetailsPage> {
       ),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(20),
-        decoration: const BoxDecoration(
-          color: Color(0xFF1E1E1E),
-          border: Border(top: BorderSide(color: Colors.white10)),
+        decoration: BoxDecoration(
+          color: surfaceColor,
+          border: Border(top: BorderSide(color: borderColor)),
         ),
         child: SafeArea(
           child: ElevatedButton(

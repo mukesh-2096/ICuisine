@@ -6,6 +6,16 @@ class MyFavoritesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? const Color(0xFF121212) : Colors.grey[50]!;
+    final textColor = Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
+    final subtextColor = isDark ? Colors.white38 : Colors.black54;
+    final iconColor = isDark ? Colors.white70 : Colors.black54;
+    final iconBackground = isDark ? Colors.white10 : Colors.black12;
+    final surfaceColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[100]!;
+    final cardColor = isDark ? const Color(0xFF252525) : Colors.grey[200]!;
+    final borderColor = isDark ? Colors.white10 : Colors.black12;
+    
     // Sample favorites
     final List<Map<String, dynamic>> favorites = [
       {'name': 'Spicy Tacos', 'category': 'Mexican', 'rating': '4.5', 'price': '₹180', 'icon': '🌮'},
@@ -13,21 +23,21 @@ class MyFavoritesPage extends StatelessWidget {
     ];
 
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+      backgroundColor: backgroundColor,
       appBar: AppBar(
-        title: Text('My Favorites', style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold)),
-        backgroundColor: const Color(0xFF121212),
+        title: Text('My Favorites', style: GoogleFonts.outfit(color: textColor, fontWeight: FontWeight.bold)),
+        backgroundColor: backgroundColor,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: textColor),
       ),
       body: favorites.isEmpty
           ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.favorite_border, size: 80, color: Colors.white10),
+                  Icon(Icons.favorite_border, size: 80, color: iconBackground),
                   const SizedBox(height: 20),
-                  Text('No favorites yet', style: GoogleFonts.outfit(color: Colors.white38, fontSize: 18)),
+                  Text('No favorites yet', style: GoogleFonts.outfit(color: subtextColor, fontSize: 18)),
                 ],
               ),
             )
@@ -45,9 +55,9 @@ class MyFavoritesPage extends StatelessWidget {
                 return Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1E1E1E),
+                    color: surfaceColor,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white10),
+                    border: Border.all(color: borderColor),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -56,7 +66,7 @@ class MyFavoritesPage extends StatelessWidget {
                         child: Container(
                           width: double.infinity,
                           decoration: BoxDecoration(
-                            color: const Color(0xFF252525),
+                            color: cardColor,
                             borderRadius: BorderRadius.circular(15),
                           ),
                           alignment: Alignment.center,
@@ -70,7 +80,7 @@ class MyFavoritesPage extends StatelessWidget {
                           Expanded(
                             child: Text(
                               item['name'],
-                              style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                              style: GoogleFonts.outfit(color: textColor, fontWeight: FontWeight.bold, fontSize: 14),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -79,7 +89,7 @@ class MyFavoritesPage extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 4),
-                      Text(item['category'], style: GoogleFonts.outfit(color: Colors.white38, fontSize: 12)),
+                      Text(item['category'], style: GoogleFonts.outfit(color: subtextColor, fontSize: 12)),
                       const SizedBox(height: 8),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -89,7 +99,7 @@ class MyFavoritesPage extends StatelessWidget {
                             children: [
                               const Icon(Icons.star, color: Colors.amber, size: 14),
                               const SizedBox(width: 2),
-                              Text(item['rating'], style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                              Text(item['rating'], style: TextStyle(color: iconColor, fontSize: 12)),
                             ],
                           ),
                         ],

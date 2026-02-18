@@ -102,17 +102,22 @@ class _PasswordSettingsPageState extends State<PasswordSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
+    final hintColor = isDark ? Colors.white10 : Colors.black26;
+    final iconColor = isDark ? Colors.white54 : Colors.black54;
+    final surfaceColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[100]!;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
       appBar: AppBar(
         title: Text(
           'Password Settings',
-          style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: Colors.white),
+          style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: textColor),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).iconTheme.color),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -123,7 +128,7 @@ class _PasswordSettingsPageState extends State<PasswordSettingsPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildLabel('Current Password'),
+              _buildLabel('Current Password', textColor),
               _buildPasswordField(
                 controller: _currentPasswordController,
                 hint: 'Enter current password',
@@ -131,9 +136,13 @@ class _PasswordSettingsPageState extends State<PasswordSettingsPage> {
                 onToggle: () => setState(() => _obscureCurrent = !_obscureCurrent),
                 validator: (value) =>
                     value == null || value.isEmpty ? 'Please enter current password' : null,
+                textColor: textColor,
+                hintColor: hintColor,
+                iconColor: iconColor,
+                surfaceColor: surfaceColor,
               ),
               const SizedBox(height: 24),
-              _buildLabel('New Password'),
+              _buildLabel('New Password', textColor),
               _buildPasswordField(
                 controller: _newPasswordController,
                 hint: 'Enter new password',
@@ -142,9 +151,13 @@ class _PasswordSettingsPageState extends State<PasswordSettingsPage> {
                 validator: (value) => (value == null || value.length < 6)
                     ? 'Password must be at least 6 characters'
                     : null,
+                textColor: textColor,
+                hintColor: hintColor,
+                iconColor: iconColor,
+                surfaceColor: surfaceColor,
               ),
               const SizedBox(height: 24),
-              _buildLabel('Confirm New Password'),
+              _buildLabel('Confirm New Password', textColor),
               _buildPasswordField(
                 controller: _confirmPasswordController,
                 hint: 'Confirm new password',
@@ -154,6 +167,10 @@ class _PasswordSettingsPageState extends State<PasswordSettingsPage> {
                   if (value != _newPasswordController.text) return 'Passwords do not match';
                   return null;
                 },
+                textColor: textColor,
+                hintColor: hintColor,
+                iconColor: iconColor,
+                surfaceColor: surfaceColor,
               ),
               const SizedBox(height: 32),
               _isLoading
@@ -200,7 +217,7 @@ class _PasswordSettingsPageState extends State<PasswordSettingsPage> {
     );
   }
 
-  Widget _buildLabel(String text) {
+  Widget _buildLabel(String text, Color textColor) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Text(
@@ -208,7 +225,7 @@ class _PasswordSettingsPageState extends State<PasswordSettingsPage> {
         style: GoogleFonts.outfit(
           fontSize: 16,
           fontWeight: FontWeight.w600,
-          color: Colors.white,
+          color: textColor,
         ),
       ),
     );
@@ -220,20 +237,24 @@ class _PasswordSettingsPageState extends State<PasswordSettingsPage> {
     required bool obscure,
     required VoidCallback onToggle,
     String? Function(String?)? validator,
+    required Color textColor,
+    required Color hintColor,
+    required Color iconColor,
+    required Color surfaceColor,
   }) {
     return TextFormField(
       controller: controller,
       obscureText: obscure,
-      style: const TextStyle(color: Colors.white),
+      style: TextStyle(color: textColor),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: const TextStyle(color: Colors.white10),
+        hintStyle: TextStyle(color: hintColor),
         filled: true,
-        fillColor: const Color(0xFF1E1E1E),
+        fillColor: surfaceColor,
         suffixIcon: IconButton(
           icon: Icon(
             obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-            color: Colors.white54,
+            color: iconColor,
           ),
           onPressed: onToggle,
         ),

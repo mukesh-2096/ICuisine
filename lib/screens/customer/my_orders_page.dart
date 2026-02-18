@@ -11,22 +11,32 @@ class MyOrdersPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? const Color(0xFF121212) : Colors.grey[50]!;
+    final textColor = Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
+    final subtextColor = isDark ? Colors.white38 : Colors.black54;
+    final hintColor = isDark ? Colors.white24 : Colors.black26;
+    final iconColor = isDark ? Colors.white70 : Colors.black54;
+    final iconBackground = isDark ? Colors.white10 : Colors.black12;
+    final surfaceColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[100]!;
+    final borderColor = isDark ? Colors.white10 : Colors.black12;
+    
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
       return Scaffold(
-        backgroundColor: const Color(0xFF121212),
-        body: Center(child: Text('Please login to view orders', style: GoogleFonts.outfit(color: Colors.white))),
+        backgroundColor: backgroundColor,
+        body: Center(child: Text('Please login to view orders', style: GoogleFonts.outfit(color: textColor))),
       );
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+      backgroundColor: backgroundColor,
       appBar: AppBar(
-        title: Text('My Orders', style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold)),
-        backgroundColor: const Color(0xFF121212),
+        title: Text('My Orders', style: GoogleFonts.outfit(color: textColor, fontWeight: FontWeight.bold)),
+        backgroundColor: backgroundColor,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: textColor),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
@@ -59,11 +69,11 @@ class MyOrdersPage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.shopping_bag_outlined, size: 80, color: Colors.white10),
+                  Icon(Icons.shopping_bag_outlined, size: 80, color: iconBackground),
                   const SizedBox(height: 20),
-                  Text('No orders yet', style: GoogleFonts.outfit(color: Colors.white38, fontSize: 18)),
+                  Text('No orders yet', style: GoogleFonts.outfit(color: subtextColor, fontSize: 18)),
                   const SizedBox(height: 10),
-                  Text('Order something delicious!', style: GoogleFonts.outfit(color: Colors.white24, fontSize: 14)),
+                  Text('Order something delicious!', style: GoogleFonts.outfit(color: hintColor, fontSize: 14)),
                 ],
               ),
             );
@@ -97,9 +107,9 @@ class MyOrdersPage extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1E1E1E),
+                    color: surfaceColor,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white10),
+                    border: Border.all(color: borderColor),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -111,7 +121,7 @@ class MyOrdersPage extends StatelessWidget {
                               child: Text(
                             vendorName,
                             style: GoogleFonts.outfit(
-                                color: Colors.white,
+                                color: textColor,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16),
                             maxLines: 1,
@@ -126,10 +136,10 @@ class MyOrdersPage extends StatelessWidget {
                       const SizedBox(height: 8),
                       Text(itemsSummary,
                           style: GoogleFonts.outfit(
-                              color: Colors.white38, fontSize: 13),
+                              color: subtextColor, fontSize: 13),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis),
-                      const Divider(height: 24, color: Colors.white10),
+                      Divider(height: 24, color: borderColor),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -138,13 +148,13 @@ class MyOrdersPage extends StatelessWidget {
                             children: [
                               Text('ORDER ID',
                                   style: GoogleFonts.outfit(
-                                      color: Colors.white24,
+                                      color: hintColor,
                                       fontSize: 9,
                                       letterSpacing: 1)),
                               Text(
                                   '#${orderDoc.id.substring(0, 8).toUpperCase()}',
                                   style: GoogleFonts.outfit(
-                                      color: Colors.white54, fontSize: 11)),
+                                      color: subtextColor, fontSize: 11)),
                             ],
                           ),
                           Container(
@@ -168,7 +178,7 @@ class MyOrdersPage extends StatelessWidget {
                       const SizedBox(height: 10),
                       Text(dateStr,
                           style: GoogleFonts.outfit(
-                              color: Colors.white24, fontSize: 11)),
+                              color: hintColor, fontSize: 11)),
                     ],
                   ),
                 ),

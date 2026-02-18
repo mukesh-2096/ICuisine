@@ -139,13 +139,22 @@ class _CustomerLoginPageState extends State<CustomerLoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? const Color(0xFF121212) : Colors.grey[50]!;
+    final surfaceColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[100]!;
+    final textColor = isDark ? Colors.white : Colors.black87;
+    final subtextColor = isDark ? Colors.white60 : Colors.black54;
+    final hintColor = isDark ? Colors.white30 : Colors.black38;
+    final iconColor = isDark ? Colors.white54 : Colors.black54;
+    final borderColor = isDark ? Colors.white.withOpacity(0.1) : Colors.grey[300]!;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+      backgroundColor: backgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: textColor),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -158,8 +167,29 @@ class _CustomerLoginPageState extends State<CustomerLoginPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Header
-                const Center(
-                  child: AppLogo(size: 100, showBackground: false),
+                Center(
+                  child: Column(
+                    children: [
+                      Text(
+                        'ICuisine',
+                        style: GoogleFonts.outfit(
+                          fontSize: 48,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFFFA5211),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Digitising Street Food',
+                        style: GoogleFonts.outfit(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: textColor.withOpacity(0.7),
+                          letterSpacing: 1.2,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 32),
                 Center(
@@ -168,7 +198,7 @@ class _CustomerLoginPageState extends State<CustomerLoginPage> {
                     style: GoogleFonts.outfit(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: textColor,
                     ),
                   ),
                 ),
@@ -178,7 +208,7 @@ class _CustomerLoginPageState extends State<CustomerLoginPage> {
                     'Welcome back! Login to order delicious food',
                     style: GoogleFonts.outfit(
                       fontSize: 15,
-                      color: Colors.white60,
+                      color: subtextColor,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -191,20 +221,20 @@ class _CustomerLoginPageState extends State<CustomerLoginPage> {
                   style: GoogleFonts.outfit(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                    color: textColor,
                   ),
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  style: const TextStyle(color: Colors.white),
+                  style: TextStyle(color: textColor),
                   decoration: InputDecoration(
                     hintText: 'Enter your email',
-                    hintStyle: const TextStyle(color: Colors.white30),
-                    prefixIcon: const Icon(Icons.email_outlined, color: Colors.white54),
+                    hintStyle: TextStyle(color: hintColor),
+                    prefixIcon: Icon(Icons.email_outlined, color: iconColor),
                     filled: true,
-                    fillColor: const Color(0xFF1E1E1E),
+                    fillColor: surfaceColor,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide.none,
@@ -232,27 +262,27 @@ class _CustomerLoginPageState extends State<CustomerLoginPage> {
                   style: GoogleFonts.outfit(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                    color: textColor,
                   ),
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: _passwordController,
                   obscureText: _obscurePassword,
-                  style: const TextStyle(color: Colors.white),
+                  style: TextStyle(color: textColor),
                   decoration: InputDecoration(
                     hintText: 'Enter your password',
-                    hintStyle: const TextStyle(color: Colors.white30),
-                    prefixIcon: const Icon(Icons.lock_outlined, color: Colors.white54),
+                    hintStyle: TextStyle(color: hintColor),
+                    prefixIcon: Icon(Icons.lock_outlined, color: iconColor),
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                        color: Colors.white54,
+                        color: iconColor,
                       ),
                       onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                     ),
                     filled: true,
-                    fillColor: const Color(0xFF1E1E1E),
+                    fillColor: surfaceColor,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide.none,
@@ -324,15 +354,15 @@ class _CustomerLoginPageState extends State<CustomerLoginPage> {
                 // Divider
                 Row(
                   children: [
-                    Expanded(child: Divider(color: Colors.white.withOpacity(0.1))),
+                    Expanded(child: Divider(color: borderColor)),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
                         'OR',
-                        style: GoogleFonts.outfit(color: Colors.white30, fontWeight: FontWeight.w500),
+                        style: GoogleFonts.outfit(color: hintColor, fontWeight: FontWeight.w500),
                       ),
                     ),
-                    Expanded(child: Divider(color: Colors.white.withOpacity(0.1))),
+                    Expanded(child: Divider(color: borderColor)),
                   ],
                 ),
                 const SizedBox(height: 32),
@@ -344,9 +374,9 @@ class _CustomerLoginPageState extends State<CustomerLoginPage> {
                   child: OutlinedButton(
                     onPressed: _isLoading ? null : _handleGoogleSignIn,
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      side: BorderSide(color: Colors.white.withOpacity(0.1)),
-                      backgroundColor: const Color(0xFF1E1E1E),
+                      foregroundColor: textColor,
+                      side: BorderSide(color: borderColor),
+                      backgroundColor: surfaceColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
@@ -375,7 +405,7 @@ class _CustomerLoginPageState extends State<CustomerLoginPage> {
                   children: [
                     Text(
                       'Don\'t have an account? ',
-                      style: GoogleFonts.outfit(color: Colors.white60, fontSize: 15),
+                      style: GoogleFonts.outfit(color: subtextColor, fontSize: 15),
                     ),
                     TextButton(
                       onPressed: () {

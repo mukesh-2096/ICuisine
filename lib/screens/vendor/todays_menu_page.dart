@@ -27,24 +27,33 @@ class _TodaysMenuPageState extends State<TodaysMenuPage> {
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? const Color(0xFF121212) : Colors.grey[50]!;
+    final surfaceColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
+    final textColor = isDark ? Colors.white : Colors.black87;
+    final subtextColor = isDark ? Colors.white70 : Colors.black54;
+    final subtextColor2 = isDark ? Colors.white60 : Colors.black54;
+    final hintColor = isDark ? Colors.white38 : Colors.black38;
+    final borderColor = isDark ? Colors.white10 : Colors.grey[300]!;
+    final iconColor = isDark ? Colors.white24 : Colors.grey;
 
     if (user == null) {
       return Scaffold(
-        backgroundColor: const Color(0xFF121212),
-        body: Center(child: Text('Please login to manage menu', style: GoogleFonts.outfit(color: Colors.white70))),
+        backgroundColor: backgroundColor,
+        body: Center(child: Text('Please login to manage menu', style: GoogleFonts.outfit(color: subtextColor))),
       );
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+      backgroundColor: backgroundColor,
       appBar: AppBar(
         title: Text(
           _viewingLive ? "Live Menu Preview" : "Manage Today's Menu",
-          style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: Colors.white),
+          style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: textColor),
         ),
-        backgroundColor: const Color(0xFF121212),
+        backgroundColor: backgroundColor,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: textColor),
         actions: [
           IconButton(
             icon: Icon(_viewingLive ? Icons.edit : Icons.close, color: const Color(0xFFFA5211)),
@@ -104,7 +113,7 @@ class _TodaysMenuPageState extends State<TodaysMenuPage> {
                     Expanded(
                       child: Text(
                         "You are currently LIVE with ${_selectedItemIds.length} items visible to customers.",
-                        style: GoogleFonts.outfit(color: Colors.white),
+                        style: GoogleFonts.outfit(color: textColor),
                       ),
                     ),
                   ],
@@ -114,10 +123,10 @@ class _TodaysMenuPageState extends State<TodaysMenuPage> {
           else
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              color: const Color(0xFF121212),
+              color: backgroundColor,
               child: Text(
                 "Check items to make them LIVE. Tap star for Today's Special.",
-                style: GoogleFonts.outfit(color: Colors.white60, fontSize: 13),
+                style: GoogleFonts.outfit(color: subtextColor2, fontSize: 13),
               ),
             ),
             
@@ -143,7 +152,7 @@ class _TodaysMenuPageState extends State<TodaysMenuPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text('No menu items found.', style: GoogleFonts.outfit(color: Colors.white38)),
+                        Text('No menu items found.', style: GoogleFonts.outfit(color: hintColor)),
                         const SizedBox(height: 10),
                         TextButton(
                            onPressed: () {
@@ -199,7 +208,7 @@ class _TodaysMenuPageState extends State<TodaysMenuPage> {
                     : docs;
 
                 if (displayDocs.isEmpty && _viewingLive) {
-                  return Center(child: Text('No items are currently live.', style: GoogleFonts.outfit(color: Colors.white38)));
+                  return Center(child: Text('No items are currently live.', style: GoogleFonts.outfit(color: hintColor)));
                 }
 
                 return ListView.builder(
@@ -216,10 +225,10 @@ class _TodaysMenuPageState extends State<TodaysMenuPage> {
                     return Container(
                       margin: const EdgeInsets.only(bottom: 12),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1E1E1E),
+                        color: surfaceColor,
                         borderRadius: BorderRadius.circular(15),
                         border: Border.all(
-                          color: isSelected ? const Color(0xFFFA5211).withOpacity(0.5) : Colors.white10,
+                          color: isSelected ? const Color(0xFFFA5211).withOpacity(0.5) : borderColor,
                         ),
                       ),
                       child: ListTile(
@@ -234,7 +243,7 @@ class _TodaysMenuPageState extends State<TodaysMenuPage> {
                               onChanged: (bool? value) => _onSelectionChanged(doc.id, value),
                               activeColor: const Color(0xFFFA5211),
                               checkColor: Colors.white,
-                              side: const BorderSide(color: Colors.white54),
+                              side: BorderSide(color: subtextColor),
                             ),
                         title: Row(
                           children: [
@@ -242,7 +251,7 @@ class _TodaysMenuPageState extends State<TodaysMenuPage> {
                               child: Text(
                                 data['name'] ?? 'Unnamed',
                                 style: GoogleFonts.outfit(
-                                  color: Colors.white,
+                                  color: textColor,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -275,7 +284,7 @@ class _TodaysMenuPageState extends State<TodaysMenuPage> {
                                 IconButton(
                                   icon: Icon(
                                     isSpecial ? Icons.star : Icons.star_border,
-                                    color: isSpecial ? Colors.amber : Colors.white24,
+                                    color: isSpecial ? Colors.amber : iconColor,
                                   ),
                                   onPressed: () => _onSpecialChanged(doc.id, !isSpecial),
                                 ),
@@ -284,13 +293,13 @@ class _TodaysMenuPageState extends State<TodaysMenuPage> {
                               height: 50,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
-                                color: Colors.white10,
+                                color: borderColor,
                                 image: data['image'] != null && data['image'].toString().isNotEmpty
                                     ? DecorationImage(image: NetworkImage(data['image']), fit: BoxFit.cover)
                                     : null,
                               ),
                               child: data['image'] == null || data['image'].toString().isEmpty
-                                  ? const Icon(Icons.fastfood, size: 20, color: Colors.white24)
+                                  ? Icon(Icons.fastfood, size: 20, color: iconColor)
                                   : null,
                             ),
                           ],
@@ -312,9 +321,9 @@ class _TodaysMenuPageState extends State<TodaysMenuPage> {
           if (_hasChanges && !_viewingLive)
             Container(
               padding: const EdgeInsets.all(20),
-              decoration: const BoxDecoration(
-                color: Color(0xFF1E1E1E),
-                borderRadius: BorderRadius.only(
+              decoration: BoxDecoration(
+                color: surfaceColor,
+                borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(20),
                   topRight: Radius.circular(20),
                 ),
@@ -378,19 +387,25 @@ class _TodaysMenuPageState extends State<TodaysMenuPage> {
   }
 
   void _confirmSetLive(BuildContext context, String userId) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final surfaceColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
+    final textColor = isDark ? Colors.white : Colors.black87;
+    final subtextColor = isDark ? Colors.white70 : Colors.black54;
+    final hintColor = isDark ? Colors.white38 : Colors.black38;
+    
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E1E),
-        title: Text('Confirm Updates', style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold)),
+        backgroundColor: surfaceColor,
+        title: Text('Confirm Updates', style: GoogleFonts.outfit(color: textColor, fontWeight: FontWeight.bold)),
         content: Text(
           'This will update your live menu. \n\n• ${_selectedItemIds.length} items will be visible to customers.\n• ${_todaySpecialIds.length} items marked as Today\'s Special.',
-          style: GoogleFonts.outfit(color: Colors.white70),
+          style: GoogleFonts.outfit(color: subtextColor),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancel', style: GoogleFonts.outfit(color: Colors.white38)),
+            child: Text('Cancel', style: GoogleFonts.outfit(color: hintColor)),
           ),
           TextButton(
             onPressed: () {

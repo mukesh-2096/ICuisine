@@ -16,34 +16,32 @@ class AppLogo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!showBackground) {
-      return SizedBox(
+      return Image.asset(
+        'images/white_logo.png',
         width: size,
         height: size,
-        child: Image.asset(
-          'images/logo.png',
-          fit: BoxFit.contain,
-        ),
+        fit: BoxFit.contain,
       );
     }
 
     return Container(
       width: size,
       height: size,
-      padding: EdgeInsets.all(size * 0.2),
       decoration: BoxDecoration(
-        color: backgroundColor ?? AppColors.primary,
+        color: backgroundColor ?? Colors.white,
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: (backgroundColor ?? AppColors.primary).withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
           ),
         ],
       ),
-      child: Center(
+      padding: EdgeInsets.all(size * 0.15),
+      child: ClipOval(
         child: Image.asset(
-          'images/logo.png',
+          'images/white_logo.png',
           fit: BoxFit.contain,
         ),
       ),

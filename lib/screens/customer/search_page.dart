@@ -86,8 +86,18 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? const Color(0xFF121212) : Colors.grey[50]!;
+    final textColor = Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
+    final subtextColor = isDark ? Colors.white54 : Colors.black54;
+    final hintColor = isDark ? Colors.white38 : Colors.black38;
+    final iconColor = isDark ? Colors.white70 : Colors.black54;
+    final surfaceColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[100]!;
+    final borderColor = isDark ? Colors.white10 : Colors.black12;
+    final chipHintColor = isDark ? Colors.white24 : Colors.black26;
+    
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+      backgroundColor: backgroundColor,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -98,14 +108,14 @@ class _SearchPageState extends State<SearchPage> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 5),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1E1E1E),
+                  color: surfaceColor,
                   borderRadius: BorderRadius.circular(15),
-                  border: Border.all(color: Colors.white10),
+                  border: Border.all(color: borderColor),
                 ),
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.white70),
+                      icon: Icon(Icons.arrow_back, color: iconColor),
                       onPressed: () => Navigator.pop(context),
                     ),
                     Expanded(
@@ -113,10 +123,10 @@ class _SearchPageState extends State<SearchPage> {
                         controller: _searchController,
                         autofocus: true,
                         cursorColor: const Color(0xFFFA5211),
-                        style: GoogleFonts.outfit(color: Colors.white),
+                        style: GoogleFonts.outfit(color: textColor),
                         decoration: InputDecoration(
                           hintText: 'Restaurant name or a dish...',
-                          hintStyle: GoogleFonts.outfit(color: Colors.white38, fontSize: 16),
+                          hintStyle: GoogleFonts.outfit(color: hintColor, fontSize: 16),
                           border: InputBorder.none,
                           contentPadding: const EdgeInsets.symmetric(vertical: 15),
                         ),
@@ -129,19 +139,19 @@ class _SearchPageState extends State<SearchPage> {
 
             Expanded(
               child: _showNotFound 
-                ? _buildNotFoundView()
+                ? _buildNotFoundView(surfaceColor, textColor, hintColor)
                 : SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Trending Searches
-                    _buildSectionHeader('TRENDING SEARCHES'),
+                    _buildSectionHeader('TRENDING SEARCHES', hintColor),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Wrap(
                         spacing: 12,
                         runSpacing: 12,
-                        children: _trendingSearches.map((tag) => _buildChip(tag, isTrending: true)).toList(),
+                        children: _trendingSearches.map((tag) => _buildChip(tag, surfaceColor, borderColor, hintColor, iconColor, isTrending: true)).toList(),
                       ),
                     ),
                     const SizedBox(height: 30),
@@ -150,7 +160,7 @@ class _SearchPageState extends State<SearchPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _buildSectionHeader('YOUR RECENT SEARCHES'),
+                        _buildSectionHeader('YOUR RECENT SEARCHES', hintColor),
                         Padding(
                           padding: const EdgeInsets.only(right: 20),
                           child: TextButton(
@@ -169,7 +179,7 @@ class _SearchPageState extends State<SearchPage> {
                         child: Wrap(
                           spacing: 12,
                           runSpacing: 12,
-                          children: _recentSearches.map((tag) => _buildChip(tag)).toList(),
+                          children: _recentSearches.map((tag) => _buildChip(tag, surfaceColor, borderColor, hintColor, iconColor)).toList(),
                         ),
                       )
                     else
@@ -177,13 +187,13 @@ class _SearchPageState extends State<SearchPage> {
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: Text(
                           'No recent searches',
-                          style: GoogleFonts.outfit(color: Colors.white24, fontSize: 14),
+                          style: GoogleFonts.outfit(color: chipHintColor, fontSize: 14),
                         ),
                       ),
                     const SizedBox(height: 40),
 
                     // What's on your mind?
-                    _buildSectionHeader('WHAT\'S ON YOUR MIND?'),
+                    _buildSectionHeader('WHAT\'S ON YOUR MIND?', hintColor),
                     const SizedBox(height: 10),
                     GridView.builder(
                       shrinkWrap: true,
@@ -218,7 +228,7 @@ class _SearchPageState extends State<SearchPage> {
                               Text(
                                 category['name']!,
                                 style: GoogleFonts.outfit(
-                                  color: Colors.white,
+                                  color: textColor,
                                   fontSize: 12,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -240,13 +250,13 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  Widget _buildSectionHeader(String title) {
+  Widget _buildSectionHeader(String title, Color hintColor) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
       child: Text(
         title,
         style: GoogleFonts.outfit(
-          color: Colors.white38,
+          color: hintColor,
           fontSize: 13,
           letterSpacing: 1.2,
           fontWeight: FontWeight.bold,
@@ -255,28 +265,28 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  Widget _buildChip(String label, {bool isTrending = false}) {
+  Widget _buildChip(String label, Color surfaceColor, Color borderColor, Color hintColor, Color iconColor, {bool isTrending = false}) {
     return GestureDetector(
       onTap: () => _onItemTap(label),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          color: const Color(0xFF1E1E1E),
+          color: surfaceColor,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.white10),
+          border: Border.all(color: borderColor),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               isTrending ? Icons.trending_up : Icons.history,
-              color: Colors.white38,
+              color: hintColor,
               size: 16,
             ),
             const SizedBox(width: 8),
             Text(
               label,
-              style: GoogleFonts.outfit(color: Colors.white70, fontSize: 14),
+              style: GoogleFonts.outfit(color: iconColor, fontSize: 14),
             ),
           ],
         ),
@@ -284,7 +294,7 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  Widget _buildNotFoundView() {
+  Widget _buildNotFoundView(Color surfaceColor, Color textColor, Color hintColor) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -292,7 +302,7 @@ class _SearchPageState extends State<SearchPage> {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: const Color(0xFF1E1E1E),
+              color: surfaceColor,
               shape: BoxShape.circle,
             ),
             child: Icon(Icons.search_off_rounded, size: 60, color: const Color(0xFFFA5211).withOpacity(0.5)),
@@ -300,14 +310,14 @@ class _SearchPageState extends State<SearchPage> {
           const SizedBox(height: 20),
           Text(
             'Item Not Found',
-            style: GoogleFonts.outfit(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+            style: GoogleFonts.outfit(color: textColor, fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 10),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 40),
             child: Text(
               'We couldn\'t find any match for "$_currentQuery". Try searching for Biriyani or Pizza!',
-              style: GoogleFonts.outfit(color: Colors.white38, fontSize: 14),
+              style: GoogleFonts.outfit(color: hintColor, fontSize: 14),
               textAlign: TextAlign.center,
             ),
           ),

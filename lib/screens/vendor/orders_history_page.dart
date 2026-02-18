@@ -9,28 +9,36 @@ class OrdersHistoryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? const Color(0xFF121212) : Colors.grey[50]!;
+    final textColor = Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
+    final subtextColor = isDark ? Colors.white38 : Colors.black54;
+    final surfaceColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[100]!;
+    final borderColor = isDark ? Colors.white10 : Colors.black12;
+    final iconDisabledColor = isDark ? Colors.white10 : Colors.black12;
+    
     final uid = FirebaseAuth.instance.currentUser?.uid;
 
     if (uid == null) {
       return Scaffold(
-        backgroundColor: const Color(0xFF121212),
+        backgroundColor: backgroundColor,
         body: Center(
           child: Text('Please login to view history',
-              style: GoogleFonts.outfit(color: Colors.white)),
+              style: GoogleFonts.outfit(color: textColor)),
         ),
       );
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+      backgroundColor: backgroundColor,
       appBar: AppBar(
         title: Text(
           'Order History',
-          style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: Colors.white),
+          style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: textColor),
         ),
-        backgroundColor: const Color(0xFF121212),
+        backgroundColor: backgroundColor,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: textColor),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
@@ -64,19 +72,19 @@ class OrdersHistoryPage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.history, size: 80, color: Colors.white10),
+                  Icon(Icons.history, size: 80, color: iconDisabledColor),
                   const SizedBox(height: 20),
                   Text(
                     'No past orders yet',
                     style: GoogleFonts.outfit(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white),
+                        color: textColor),
                   ),
                   const SizedBox(height: 10),
                   Text(
                     'All completed orders will appear here.',
-                    style: GoogleFonts.outfit(color: Colors.white38),
+                    style: GoogleFonts.outfit(color: subtextColor),
                   ),
                 ],
               ),
@@ -106,9 +114,9 @@ class OrdersHistoryPage extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1E1E1E),
+                    color: surfaceColor,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white10),
+                    border: Border.all(color: borderColor),
                   ),
                   child: Row(
                     children: [
@@ -134,12 +142,12 @@ class OrdersHistoryPage extends StatelessWidget {
                             Text(
                               'Order #${doc.id.substring(0, 6).toUpperCase()}',
                               style: GoogleFonts.outfit(
-                                  color: Colors.white, fontWeight: FontWeight.bold),
+                                  color: textColor, fontWeight: FontWeight.bold),
                             ),
                             Text(
                               '${order['customerName'] ?? 'Customer'} • ${items.length} items',
                               style: GoogleFonts.outfit(
-                                  color: Colors.white38, fontSize: 13),
+                                  color: subtextColor, fontSize: 13),
                             ),
                           ],
                         ),
@@ -150,7 +158,7 @@ class OrdersHistoryPage extends StatelessWidget {
                           Text(
                             '₹${(order['totalAmount'] ?? 0).toInt()}',
                             style: GoogleFonts.outfit(
-                                color: Colors.white,
+                                color: textColor,
                                 fontWeight: FontWeight.w900,
                                 fontSize: 16),
                           ),

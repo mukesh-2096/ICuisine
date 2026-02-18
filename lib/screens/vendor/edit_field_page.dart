@@ -106,17 +106,21 @@ class _EditFieldPageState extends State<EditFieldPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
+    final hintColor = isDark ? Colors.white10 : Colors.black26;
+    final surfaceColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[100]!;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
       appBar: AppBar(
         title: Text(
           'Edit ${widget.title}',
-          style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: Colors.white),
+          style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: textColor),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).iconTheme.color),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -139,7 +143,7 @@ class _EditFieldPageState extends State<EditFieldPage> {
                                 style: GoogleFonts.outfit(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
-                                  color: Colors.white,
+                                  color: textColor,
                                 ),
                               ),
                               const SizedBox(height: 12),
@@ -147,12 +151,12 @@ class _EditFieldPageState extends State<EditFieldPage> {
                                 controller: _controllers[field.key],
                                 keyboardType: field.inputType,
                                 maxLines: field.maxLines,
-                                style: const TextStyle(color: Colors.white),
+                                style: TextStyle(color: textColor),
                                 decoration: InputDecoration(
                                   hintText: 'Enter ${field.label}',
-                                  hintStyle: const TextStyle(color: Colors.white10),
+                                  hintStyle: TextStyle(color: hintColor),
                                   filled: true,
-                                  fillColor: const Color(0xFF1E1E1E),
+                                  fillColor: surfaceColor,
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(16),
                                     borderSide: BorderSide.none,

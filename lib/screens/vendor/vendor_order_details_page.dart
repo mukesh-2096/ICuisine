@@ -10,15 +10,25 @@ class VendorOrderDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? const Color(0xFF121212) : Colors.grey[50]!;
+    final textColor = Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
+    final subtextColor = isDark ? Colors.white38 : Colors.black54;
+    final subtextColor2 = isDark ? Colors.white54 : Colors.black54;
+    final surfaceColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[100]!;
+    final borderColor = isDark ? Colors.white10 : Colors.black12;
+    final iconDisabledColor = isDark ? Colors.white10 : Colors.black12;
+    final iconColor = isDark ? Colors.white38 : Colors.black45;
+    
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+      backgroundColor: backgroundColor,
       appBar: AppBar(
         title: Text('Order Details',
             style: GoogleFonts.outfit(
-                color: Colors.white, fontWeight: FontWeight.bold)),
-        backgroundColor: const Color(0xFF121212),
+                color: textColor, fontWeight: FontWeight.bold)),
+        backgroundColor: backgroundColor,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: textColor),
       ),
       body: StreamBuilder<DocumentSnapshot>(
         stream: FirebaseFirestore.instance
@@ -34,13 +44,13 @@ class VendorOrderDetailsPage extends StatelessWidget {
           if (!snapshot.hasData || !snapshot.data!.exists) {
             return Center(
                 child: Text('Order not found',
-                    style: GoogleFonts.outfit(color: Colors.white)));
+                    style: GoogleFonts.outfit(color: textColor)));
           }
 
           final order = snapshot.data!.data() as Map<String, dynamic>;
           final List items = order['items'] ?? [];
           final String status = order['status'] ?? 'Pending';
-          final String customerName = order['customerName'] ?? 'Customer';
+          final String customerId = order['customerId'] ?? 'Unknown';
           final double totalAmount = (order['totalAmount'] ?? 0).toDouble();
           final Map<String, dynamic>? address = order['address'];
           final createdAt = (order['createdAt'] as Timestamp?)?.toDate();
@@ -82,7 +92,7 @@ class VendorOrderDetailsPage extends StatelessWidget {
                                       color: Colors.redAccent, fontSize: 13)),
                             Text('Updated: $dateStr',
                                 style: GoogleFonts.outfit(
-                                    color: Colors.white38, fontSize: 12)),
+                                    color: subtextColor, fontSize: 12)),
                           ],
                         ),
                       ),
@@ -95,36 +105,36 @@ class VendorOrderDetailsPage extends StatelessWidget {
                 // Customer Info
                 Text('Customer Info',
                     style: GoogleFonts.outfit(
-                        color: Colors.white,
+                        color: textColor,
                         fontSize: 18,
                         fontWeight: FontWeight.bold)),
                 const SizedBox(height: 15),
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1E1E1E),
+                    color: surfaceColor,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white10),
+                    border: Border.all(color: borderColor),
                   ),
                   child: Row(
                     children: [
-                      const CircleAvatar(
-                        backgroundColor: Colors.white10,
-                        child: Icon(Icons.person, color: Colors.white38),
+                      CircleAvatar(
+                        backgroundColor: iconDisabledColor,
+                        child: Icon(Icons.person, color: iconColor),
                       ),
                       const SizedBox(width: 15),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(customerName,
+                            Text('Customer ID',
                                 style: GoogleFonts.outfit(
-                                    color: Colors.white,
+                                    color: textColor,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16)),
-                            Text('Customer ID: #${order['customerId']?.toString().substring(0, 6).toUpperCase()}',
+                            Text('#${customerId.substring(0, customerId.length < 8 ? customerId.length : 8).toUpperCase()}',
                                 style: GoogleFonts.outfit(
-                                    color: Colors.white38, fontSize: 12)),
+                                    color: subtextColor, fontSize: 12)),
                           ],
                         ),
                       ),
@@ -137,16 +147,16 @@ class VendorOrderDetailsPage extends StatelessWidget {
                 // Delivery Address
                 Text('Delivery Address',
                     style: GoogleFonts.outfit(
-                        color: Colors.white,
+                        color: textColor,
                         fontSize: 18,
                         fontWeight: FontWeight.bold)),
                 const SizedBox(height: 15),
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1E1E1E),
+                    color: surfaceColor,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white10),
+                    border: Border.all(color: borderColor),
                   ),
                   child: Row(
                     children: [
@@ -159,11 +169,11 @@ class VendorOrderDetailsPage extends StatelessWidget {
                           children: [
                             Text(address?['label'] ?? 'Delivery Address',
                                 style: GoogleFonts.outfit(
-                                    color: Colors.white,
+                                    color: textColor,
                                     fontWeight: FontWeight.bold)),
                             Text(address?['address'] ?? 'No address provided',
                                 style: GoogleFonts.outfit(
-                                    color: Colors.white54, fontSize: 13)),
+                                    color: subtextColor2, fontSize: 13)),
                           ],
                         ),
                       ),
@@ -176,16 +186,16 @@ class VendorOrderDetailsPage extends StatelessWidget {
                 // Order Items
                 Text('Items Ordered',
                     style: GoogleFonts.outfit(
-                        color: Colors.white,
+                        color: textColor,
                         fontSize: 18,
                         fontWeight: FontWeight.bold)),
                 const SizedBox(height: 15),
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1E1E1E),
+                    color: surfaceColor,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white10),
+                    border: Border.all(color: borderColor),
                   ),
                   child: Column(
                     children: items.map((item) => Padding(
@@ -210,18 +220,18 @@ class VendorOrderDetailsPage extends StatelessWidget {
                                   children: [
                                     Text(item['name'],
                                         style: GoogleFonts.outfit(
-                                            color: Colors.white,
+                                            color: textColor,
                                             fontWeight: FontWeight.w600)),
                                     Text('Quantity: ${item['quantity']}',
                                         style: GoogleFonts.outfit(
-                                            color: Colors.white38,
+                                            color: subtextColor,
                                             fontSize: 12)),
                                   ],
                                 ),
                               ),
                               Text('₹${(item['price'] * item['quantity']).toInt()}',
                                   style: GoogleFonts.outfit(
-                                      color: Colors.white,
+                                      color: textColor,
                                       fontWeight: FontWeight.bold)),
                             ],
                           ),

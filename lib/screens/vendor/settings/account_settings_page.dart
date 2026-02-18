@@ -101,17 +101,22 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
+    final hintColor = isDark ? Colors.white10 : Colors.black26;
+    final iconColor = isDark ? Colors.white54 : Colors.black54;
+    final surfaceColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[100]!;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
       appBar: AppBar(
         title: Text(
           'Account Settings',
-          style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: Colors.white),
+          style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: textColor),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).iconTheme.color),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -120,20 +125,28 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildLabel('Email Address'),
+            _buildLabel('Email Address', textColor),
             _buildTextField(
               controller: _emailController,
               hint: 'Enter email address',
               icon: Icons.email_outlined,
               keyboardType: TextInputType.emailAddress,
+              textColor: textColor,
+              hintColor: hintColor,
+              iconColor: iconColor,
+              surfaceColor: surfaceColor,
             ),
             const SizedBox(height: 24),
-            _buildLabel('Phone Number'),
+            _buildLabel('Phone Number', textColor),
             _buildTextField(
               controller: _phoneController,
               hint: 'Enter phone number',
               icon: Icons.phone_outlined,
               keyboardType: TextInputType.phone,
+              textColor: textColor,
+              hintColor: hintColor,
+              iconColor: iconColor,
+              surfaceColor: surfaceColor,
             ),
             const SizedBox(height: 40),
             _isLoading
@@ -166,7 +179,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
     );
   }
 
-  Widget _buildLabel(String text) {
+  Widget _buildLabel(String text, Color textColor) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Text(
@@ -174,7 +187,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
         style: GoogleFonts.outfit(
           fontSize: 16,
           fontWeight: FontWeight.w600,
-          color: Colors.white,
+          color: textColor,
         ),
       ),
     );
@@ -185,17 +198,21 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
     required String hint,
     required IconData icon,
     TextInputType keyboardType = TextInputType.text,
+    required Color textColor,
+    required Color hintColor,
+    required Color iconColor,
+    required Color surfaceColor,
   }) {
     return TextField(
       controller: controller,
-      style: const TextStyle(color: Colors.white),
+      style: TextStyle(color: textColor),
       keyboardType: keyboardType,
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: const TextStyle(color: Colors.white10),
-        prefixIcon: Icon(icon, color: Colors.white54),
+        hintStyle: TextStyle(color: hintColor),
+        prefixIcon: Icon(icon, color: iconColor),
         filled: true,
-        fillColor: const Color(0xFF1E1E1E),
+        fillColor: surfaceColor,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide.none,

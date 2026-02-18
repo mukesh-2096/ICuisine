@@ -145,57 +145,93 @@ class _VendorSignupPageState extends State<VendorSignupPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? const Color(0xFF121212) : Colors.grey[50]!;
+    final surfaceColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[100]!;
+    final textColor = isDark ? Colors.white : Colors.black87;
+    final subtextColor = isDark ? Colors.white60 : Colors.black54;
+    final hintColor = isDark ? Colors.white30 : Colors.black38;
+    final iconColor = isDark ? Colors.white54 : Colors.black54;
+    final borderColor = isDark ? Colors.white.withOpacity(0.1) : Colors.grey[300]!;
+    final checkboxBorderColor = isDark ? Colors.white54 : Colors.black54;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+      backgroundColor: backgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: textColor),
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const SizedBox(height: 16),
                 // Header
-                const Center(
-                  child: AppLogo(size: 100, showBackground: false),
+                Center(
+                  child: Column(
+                    children: [
+                      Text(
+                        'ICuisine',
+                        style: GoogleFonts.outfit(
+                          fontSize: 44,
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xFFFA5211),
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Digitising Street Food',
+                        style: GoogleFonts.outfit(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w400,
+                          color: subtextColor,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 36),
                 Center(
                   child: Text(
                     'Create Vendor Account',
                     style: GoogleFonts.outfit(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      fontSize: 26,
+                      fontWeight: FontWeight.w700,
+                      color: textColor,
+                      letterSpacing: -0.3,
                     ),
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
                 Center(
                   child: Text(
                     'Start managing your orders efficiently',
                     style: GoogleFonts.outfit(
                       fontSize: 14,
-                      color: Colors.white60,
+                      fontWeight: FontWeight.w400,
+                      color: subtextColor,
+                      height: 1.4,
                     ),
                   ),
                 ),
-                const SizedBox(height: 48),
+                const SizedBox(height: 32),
 
                 // Business Name
-                _buildLabel('Business Name'),
+                _buildLabel('Business Name', textColor),
                 TextFormField(
                   controller: _businessNameController,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: _buildInputDecoration('Enter your business name', Icons.business),
+                  style: TextStyle(color: textColor, fontSize: 15),
+                  decoration: _buildInputDecoration('Enter your business name', Icons.business, surfaceColor, hintColor, iconColor),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your business name';
@@ -203,14 +239,14 @@ class _VendorSignupPageState extends State<VendorSignupPage> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 18),
 
                 // Owner Name
-                _buildLabel('Owner Name'),
+                _buildLabel('Owner Name', textColor),
                 TextFormField(
                   controller: _ownerNameController,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: _buildInputDecoration('Enter your full name', Icons.person_outline),
+                  style: TextStyle(color: textColor, fontSize: 15),
+                  decoration: _buildInputDecoration('Enter your full name', Icons.person_outline, surfaceColor, hintColor, iconColor),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your name';
@@ -218,15 +254,15 @@ class _VendorSignupPageState extends State<VendorSignupPage> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 18),
 
                 // Email
-                _buildLabel('Email Address'),
+                _buildLabel('Email Address', textColor),
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: _buildInputDecoration('Enter your email', Icons.email_outlined),
+                  style: TextStyle(color: textColor, fontSize: 15),
+                  decoration: _buildInputDecoration('Enter your email', Icons.email_outlined, surfaceColor, hintColor, iconColor),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your email';
@@ -237,15 +273,15 @@ class _VendorSignupPageState extends State<VendorSignupPage> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 18),
 
                 // Phone Number
-                _buildLabel('Phone Number'),
+                _buildLabel('Phone Number', textColor),
                 TextFormField(
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: _buildInputDecoration('Enter your phone number', Icons.phone_outlined),
+                  style: TextStyle(color: textColor, fontSize: 15),
+                  decoration: _buildInputDecoration('Enter your phone number', Icons.phone_outlined, surfaceColor, hintColor, iconColor),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your phone number';
@@ -256,21 +292,25 @@ class _VendorSignupPageState extends State<VendorSignupPage> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 18),
 
                 // Password
-                _buildLabel('Password'),
+                _buildLabel('Password', textColor),
                 TextFormField(
                   controller: _passwordController,
                   obscureText: _obscurePassword,
-                  style: const TextStyle(color: Colors.white),
+                  style: TextStyle(color: textColor, fontSize: 15),
                   decoration: _buildInputDecoration(
                     'Create a password',
                     Icons.lock_outlined,
+                    surfaceColor,
+                    hintColor,
+                    iconColor,
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                        color: Colors.white54,
+                        color: iconColor,
+                        size: 22,
                       ),
                       onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                     ),
@@ -285,21 +325,25 @@ class _VendorSignupPageState extends State<VendorSignupPage> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 18),
 
                 // Confirm Password
-                _buildLabel('Confirm Password'),
+                _buildLabel('Confirm Password', textColor),
                 TextFormField(
                   controller: _confirmPasswordController,
                   obscureText: _obscureConfirmPassword,
-                  style: const TextStyle(color: Colors.white),
+                  style: TextStyle(color: textColor, fontSize: 15),
                   decoration: _buildInputDecoration(
                     'Confirm your password',
                     Icons.lock_outlined,
+                    surfaceColor,
+                    hintColor,
+                    iconColor,
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscureConfirmPassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                        color: Colors.white54,
+                        color: iconColor,
+                        size: 22,
                       ),
                       onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
                     ),
@@ -314,115 +358,127 @@ class _VendorSignupPageState extends State<VendorSignupPage> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
 
                 // Terms and Conditions
                 Theme(
-                  data: ThemeData(unselectedWidgetColor: Colors.white54),
+                  data: ThemeData(unselectedWidgetColor: checkboxBorderColor),
                   child: Row(
                     children: [
-                      Checkbox(
-                        value: _acceptTerms,
-                        onChanged: (value) {
-                          setState(() {
-                            _acceptTerms = value ?? false;
-                          });
-                        },
-                        activeColor: const Color(0xFFFA5211),
-                        side: const BorderSide(color: Colors.white54),
+                      Transform.scale(
+                        scale: 1.1,
+                        child: Checkbox(
+                          value: _acceptTerms,
+                          onChanged: (value) {
+                            setState(() {
+                              _acceptTerms = value ?? false;
+                            });
+                          },
+                          activeColor: const Color(0xFFFA5211),
+                          side: BorderSide(color: checkboxBorderColor, width: 1.5),
+                        ),
                       ),
                       Expanded(
                         child: Text(
                           'I accept the Terms and Conditions',
                           style: GoogleFonts.outfit(
-                            fontSize: 14,
-                            color: Colors.white70,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: subtextColor,
                           ),
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 28),
 
                 // Signup Button
                 SizedBox(
                   width: double.infinity,
-                  height: 60,
+                  height: 56,
                   child: ElevatedButton(
                     onPressed: _isLoading ? null : _handleSignup,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFFA5211),
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(14),
                       ),
                       elevation: 0,
+                      shadowColor: const Color(0xFFFA5211).withOpacity(0.3),
                     ),
                     child: _isLoading
                         ? const SizedBox(
-                            height: 24,
-                            width: 24,
-                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                            height: 22,
+                            width: 22,
+                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
                           )
                         : Text(
                             'Create Account',
                             style: GoogleFonts.outfit(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                              fontSize: 17,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.3,
                             ),
                           ),
                   ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 28),
 
                 // Divider
                 Row(
                   children: [
-                    Expanded(child: Divider(color: Colors.white.withOpacity(0.1))),
+                    Expanded(child: Divider(color: borderColor, thickness: 1)),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Text(
                         'OR',
-                        style: GoogleFonts.outfit(color: Colors.white30, fontWeight: FontWeight.w500),
+                        style: GoogleFonts.outfit(
+                          color: subtextColor, 
+                          fontWeight: FontWeight.w500,
+                          fontSize: 13,
+                          letterSpacing: 0.5,
+                        ),
                       ),
                     ),
-                    Expanded(child: Divider(color: Colors.white.withOpacity(0.1))),
+                    Expanded(child: Divider(color: borderColor, thickness: 1)),
                   ],
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 28),
 
                 // Google Signup
                 SizedBox(
                   width: double.infinity,
-                  height: 60,
+                  height: 56,
                   child: OutlinedButton(
                     onPressed: _isLoading ? null : _handleGoogleSignIn,
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      side: BorderSide(color: Colors.white.withOpacity(0.1)),
-                      backgroundColor: const Color(0xFF1E1E1E),
+                      foregroundColor: textColor,
+                      side: BorderSide(color: borderColor, width: 1.5),
+                      backgroundColor: surfaceColor,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(14),
                       ),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const GoogleLogo(size: 24),
+                        const GoogleLogo(size: 22),
                         const SizedBox(width: 12),
                         Text(
                           'Sign up with Google',
                           style: GoogleFonts.outfit(
-                            fontSize: 16,
+                            fontSize: 15,
                             fontWeight: FontWeight.w600,
+                            letterSpacing: 0.2,
                           ),
                         ),
                       ],
                     ),
                   ),
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 32),
 
                 // Login Link
                 Row(
@@ -430,24 +486,33 @@ class _VendorSignupPageState extends State<VendorSignupPage> {
                   children: [
                     Text(
                       'Already have an account? ',
-                      style: GoogleFonts.outfit(color: Colors.white60, fontSize: 15),
+                      style: GoogleFonts.outfit(
+                        color: subtextColor, 
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
                     TextButton(
                       onPressed: () {
                         Navigator.pop(context);
                       },
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
                       child: Text(
                         'Login',
                         style: GoogleFonts.outfit(
                           color: const Color(0xFFFA5211),
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 24),
               ],
             ),
           ),
@@ -456,35 +521,36 @@ class _VendorSignupPageState extends State<VendorSignupPage> {
     );
   }
 
-  Widget _buildLabel(String text) {
+  Widget _buildLabel(String text, Color textColor) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: 10),
       child: Text(
         text,
         style: GoogleFonts.outfit(
-          fontSize: 16,
+          fontSize: 15,
           fontWeight: FontWeight.w600,
-          color: Colors.white,
+          color: textColor,
         ),
       ),
     );
   }
 
-  InputDecoration _buildInputDecoration(String hint, IconData icon, {Widget? suffixIcon}) {
+  InputDecoration _buildInputDecoration(String hint, IconData icon, Color surfaceColor, Color hintColor, Color iconColor, {Widget? suffixIcon}) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: const TextStyle(color: Colors.white30),
-      prefixIcon: Icon(icon, color: Colors.white54),
+      hintStyle: TextStyle(color: hintColor, fontSize: 14),
+      prefixIcon: Icon(icon, color: iconColor, size: 22),
       suffixIcon: suffixIcon,
       filled: true,
-      fillColor: const Color(0xFF1E1E1E),
+      fillColor: surfaceColor,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
         borderSide: BorderSide.none,
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: Color(0xFFFA5211), width: 1.5),
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(color: Color(0xFFFA5211), width: 2),
       ),
     );
   }
