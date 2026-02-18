@@ -7,41 +7,52 @@ import 'my_orders_page.dart';
 import 'my_favorites_page.dart';
 import 'account_settings_page.dart';
 import 'manage_addresses_page.dart';
+import '../vendor/settings/theme_settings_page.dart';
 
 class CustomerProfilePage extends StatelessWidget {
   const CustomerProfilePage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? const Color(0xFF121212) : Colors.grey[50]!;
+    final textColor = Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
+    final subtextColor = isDark ? Colors.white38 : Colors.black54;
+    final iconColor = isDark ? Colors.white70 : Colors.black54;
+    final iconDisabledColor = isDark ? Colors.white24 : Colors.black26;
+    final surfaceColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[100]!;
+    final borderColor = isDark ? Colors.white10 : Colors.black12;
+    final iconBackground = isDark ? Colors.white10 : Colors.black12;
+    
     final user = FirebaseAuth.instance.currentUser;
     final authService = AuthService();
 
     if (user == null) {
-      return const Scaffold(
-        backgroundColor: Color(0xFF121212),
-        body: Center(child: Text('Please login to view profile', style: TextStyle(color: Colors.white70))),
+      return Scaffold(
+        backgroundColor: backgroundColor,
+        body: Center(child: Text('Please login to view profile', style: TextStyle(color: subtextColor))),
       );
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+      backgroundColor: backgroundColor,
       appBar: AppBar(
-        title: Text('Profile', style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold)),
-        backgroundColor: const Color(0xFF121212),
+        title: Text('Profile', style: GoogleFonts.outfit(color: textColor, fontWeight: FontWeight.bold)),
+        backgroundColor: backgroundColor,
         elevation: 0,
         actions: [
           PopupMenuButton<String>(
             offset: const Offset(0, 50),
-            color: const Color(0xFF1E1E1E),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15), side: const BorderSide(color: Colors.white10)),
+            color: surfaceColor,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15), side: BorderSide(color: borderColor)),
             icon: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFF1E1E1E),
+                color: surfaceColor,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.white10),
+                border: Border.all(color: borderColor),
               ),
-              child: const Icon(Icons.settings_outlined, color: Colors.white, size: 20),
+              child: Icon(Icons.settings_outlined, color: textColor, size: 20),
             ),
             onSelected: (value) async {
               if (value == 'logout') {
@@ -54,10 +65,10 @@ class CustomerProfilePage extends StatelessWidget {
               }
             },
             itemBuilder: (context) => [
-              _buildPopupItem('forgot_password', Icons.lock_outline, 'Forgot Password'),
-              _buildPopupItem('account_settings', Icons.manage_accounts_outlined, 'Account Settings'),
+              _buildPopupItem('forgot_password', Icons.lock_outline, 'Forgot Password', iconColor, iconColor),
+              _buildPopupItem('account_settings', Icons.manage_accounts_outlined, 'Account Settings', iconColor, iconColor),
               const PopupMenuDivider(height: 1),
-              _buildPopupItem('logout', Icons.logout, 'Logout', color: Colors.redAccent),
+              _buildPopupItem('logout', Icons.logout, 'Logout', Colors.redAccent, Colors.redAccent),
             ],
           ),
           const SizedBox(width: 15),
@@ -115,7 +126,7 @@ class CustomerProfilePage extends StatelessWidget {
                         height: 120,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: const Color(0xFF1E1E1E),
+                          color: surfaceColor,
                           border: Border.all(color: const Color(0xFFFA5211), width: 2),
                           boxShadow: [
                             BoxShadow(color: const Color(0xFFFA5211).withOpacity(0.1), blurRadius: 20, spreadRadius: 5),
@@ -124,7 +135,7 @@ class CustomerProfilePage extends StatelessWidget {
                         child: ClipOval(
                           child: profileImage.isNotEmpty
                               ? Image.network(profileImage, fit: BoxFit.cover)
-                              : const Icon(Icons.person, size: 60, color: Colors.white10),
+                              : Icon(Icons.person, size: 60, color: iconBackground),
                         ),
                       ),
                       Container(
@@ -140,7 +151,7 @@ class CustomerProfilePage extends StatelessWidget {
                 // Name
                 Text(
                   name,
-                  style: GoogleFonts.outfit(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                  style: GoogleFonts.outfit(color: textColor, fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 10),
                 Text(
@@ -151,36 +162,40 @@ class CustomerProfilePage extends StatelessWidget {
                 const SizedBox(height: 40),
                 
                 // Details Section
-                _buildInfoCard('Email Address', email, Icons.email_outlined),
+                _buildInfoCard('Email Address', email, Icons.email_outlined, surfaceColor, borderColor, subtextColor, textColor),
                 const SizedBox(height: 16),
-                _buildInfoCard('Mobile Number', phone, Icons.phone_android_outlined),
+                _buildInfoCard('Mobile Number', phone, Icons.phone_android_outlined, surfaceColor, borderColor, subtextColor, textColor),
                 
                 const SizedBox(height: 40),
                 
                 // Additional List
                 Container(
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1E1E1E),
+                    color: surfaceColor,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white10),
+                    border: Border.all(color: borderColor),
                   ),
                   child: Column(
                     children: [
                       _buildListTile('My Orders', Icons.shopping_bag_outlined, () {
                         _animatedNav(context, const MyOrdersPage());
-                      }),
-                      const Divider(color: Colors.white10, height: 1),
+                      }, iconColor, textColor, iconDisabledColor),
+                      Divider(color: borderColor, height: 1),
                       _buildListTile('My Favorites', Icons.favorite_border, () {
                         _animatedNav(context, const MyFavoritesPage());
-                      }),
-                      const Divider(color: Colors.white10, height: 1),
+                      }, iconColor, textColor, iconDisabledColor),
+                      Divider(color: borderColor, height: 1),
                       _buildListTile('Addresses', Icons.location_on_outlined, () {
                         _animatedNav(context, const ManageAddressesPage());
-                      }),
-                      const Divider(color: Colors.white10, height: 1),
+                      }, iconColor, textColor, iconDisabledColor),
+                      Divider(color: borderColor, height: 1),
+                      _buildListTile('Theme', Icons.palette_outlined, () {
+                        _animatedNav(context, const ThemeSettingsPage());
+                      }, iconColor, textColor, iconDisabledColor),
+                      Divider(color: borderColor, height: 1),
                       _buildListTile('Help & Support', Icons.help_outline, () {
                         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Help & Support coming soon!')));
-                      }),
+                      }, iconColor, textColor, iconDisabledColor),
                     ],
                   ),
                 ),
@@ -213,13 +228,13 @@ class CustomerProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoCard(String label, String value, IconData icon) {
+  Widget _buildInfoCard(String label, String value, IconData icon, Color surfaceColor, Color borderColor, Color subtextColor, Color textColor) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E),
+        color: surfaceColor,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white10),
+        border: Border.all(color: borderColor),
       ),
       child: Row(
         children: [
@@ -233,9 +248,9 @@ class CustomerProfilePage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label, style: GoogleFonts.outfit(color: Colors.white38, fontSize: 12)),
+                Text(label, style: GoogleFonts.outfit(color: subtextColor, fontSize: 12)),
                 const SizedBox(height: 4),
-                Text(value, style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 15)),
+                Text(value, style: GoogleFonts.outfit(color: textColor, fontWeight: FontWeight.w600, fontSize: 15)),
               ],
             ),
           ),
@@ -244,23 +259,23 @@ class CustomerProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _buildListTile(String title, IconData icon, VoidCallback onTap) {
+  Widget _buildListTile(String title, IconData icon, VoidCallback onTap, Color iconColor, Color textColor, Color iconDisabledColor) {
     return ListTile(
-      leading: Icon(icon, color: Colors.white70, size: 22),
-      title: Text(title, style: GoogleFonts.outfit(color: Colors.white, fontSize: 15)),
-      trailing: const Icon(Icons.chevron_right, color: Colors.white24, size: 18),
+      leading: Icon(icon, color: iconColor, size: 22),
+      title: Text(title, style: GoogleFonts.outfit(color: textColor, fontSize: 15)),
+      trailing: Icon(Icons.chevron_right, color: iconDisabledColor, size: 18),
       onTap: onTap,
     );
   }
 
-  PopupMenuItem<String> _buildPopupItem(String value, IconData icon, String text, {Color? color}) {
+  PopupMenuItem<String> _buildPopupItem(String value, IconData icon, String text, Color iconColor, Color textColor) {
     return PopupMenuItem(
       value: value,
       child: Row(
         children: [
-          Icon(icon, color: color ?? Colors.white70, size: 20),
+          Icon(icon, color: iconColor, size: 20),
           const SizedBox(width: 12),
-          Text(text, style: GoogleFonts.outfit(color: color ?? Colors.white70, fontSize: 14)),
+          Text(text, style: GoogleFonts.outfit(color: textColor, fontSize: 14)),
         ],
       ),
     );

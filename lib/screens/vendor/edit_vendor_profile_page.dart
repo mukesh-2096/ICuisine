@@ -221,17 +221,26 @@ class _EditVendorProfilePageState extends State<EditVendorProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? const Color(0xFF121212) : Colors.grey[50]!;
+    final textColor = Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
+    final surfaceColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[100]!;
+    final hintColor = isDark ? Colors.white10 : Colors.black26;
+    final iconColor = isDark ? Colors.white54 : Colors.black54;
+    final borderColor = isDark ? Colors.white10 : Colors.black12;
+    final iconDisabledColor = isDark ? Colors.white24 : Colors.black26;
+    
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+      backgroundColor: backgroundColor,
       appBar: AppBar(
         title: Text(
           'Edit Profile',
-          style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: Colors.white),
+          style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: textColor),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: textColor),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -246,20 +255,20 @@ class _EditVendorProfilePageState extends State<EditVendorProfilePage> {
                   children: [
                     Row(
                       children: [
-                        Expanded(child: _buildImagePicker('Profile Image', _profileImageFile, _profileImageUrl, true)),
+                        Expanded(child: _buildImagePicker('Profile Image', _profileImageFile, _profileImageUrl, true, surfaceColor, borderColor, iconDisabledColor, textColor)),
                         const SizedBox(width: 20),
-                        Expanded(child: _buildImagePicker('Business Image', _businessImageFile, _businessImageUrl, false)),
+                        Expanded(child: _buildImagePicker('Business Image', _businessImageFile, _businessImageUrl, false, surfaceColor, borderColor, iconDisabledColor, textColor)),
                       ],
                     ),
                     const SizedBox(height: 32),
-                    _buildTextField('Full Name', _nameController, Icons.person_outline),
-                    _buildTextField('Phone Number', _phoneController, Icons.phone_outlined, keyboardType: TextInputType.phone),
-                    _buildTextField('Business Name', _businessNameController, Icons.store_outlined),
-                    _buildTextField('Business Category', _businessCategoryController, Icons.category_outlined),
-                    _buildTextField('Address', _addressController, Icons.location_on_outlined, maxLines: 3),
-                    _buildTextField('Bank Account', _bankAccountController, Icons.account_balance_outlined),
-                    _buildTextField('UPI ID', _upiIdController, Icons.qr_code_outlined),
-                    _buildTextField('FSSAI License', _fssaiController, Icons.verified_user_outlined),
+                    _buildTextField('Full Name', _nameController, Icons.person_outline, surfaceColor, hintColor, iconColor, textColor),
+                    _buildTextField('Phone Number', _phoneController, Icons.phone_outlined, surfaceColor, hintColor, iconColor, textColor, keyboardType: TextInputType.phone),
+                    _buildTextField('Business Name', _businessNameController, Icons.store_outlined, surfaceColor, hintColor, iconColor, textColor),
+                    _buildTextField('Business Category', _businessCategoryController, Icons.category_outlined, surfaceColor, hintColor, iconColor, textColor),
+                    _buildTextField('Address', _addressController, Icons.location_on_outlined, surfaceColor, hintColor, iconColor, textColor, maxLines: 3),
+                    _buildTextField('Bank Account', _bankAccountController, Icons.account_balance_outlined, surfaceColor, hintColor, iconColor, textColor),
+                    _buildTextField('UPI ID', _upiIdController, Icons.qr_code_outlined, surfaceColor, hintColor, iconColor, textColor),
+                    _buildTextField('FSSAI License', _fssaiController, Icons.verified_user_outlined, surfaceColor, hintColor, iconColor, textColor),
                     const SizedBox(height: 40),
                     SizedBox(
                       width: double.infinity,
@@ -290,7 +299,7 @@ class _EditVendorProfilePageState extends State<EditVendorProfilePage> {
     );
   }
 
-  Widget _buildImagePicker(String label, File? imageFile, String? imageUrl, bool isProfile) {
+  Widget _buildImagePicker(String label, File? imageFile, String? imageUrl, bool isProfile, Color surfaceColor, Color borderColor, Color iconDisabledColor, Color textColor) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -299,7 +308,7 @@ class _EditVendorProfilePageState extends State<EditVendorProfilePage> {
           style: GoogleFonts.outfit(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: Colors.white,
+            color: textColor,
           ),
         ),
         const SizedBox(height: 12),
@@ -308,9 +317,9 @@ class _EditVendorProfilePageState extends State<EditVendorProfilePage> {
           child: Container(
             height: 120,
             decoration: BoxDecoration(
-              color: const Color(0xFF1E1E1E),
+              color: surfaceColor,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white10),
+              border: Border.all(color: borderColor),
               image: imageFile != null
                   ? DecorationImage(image: FileImage(imageFile), fit: BoxFit.cover)
                   : (imageUrl != null && imageUrl.isNotEmpty
@@ -318,7 +327,7 @@ class _EditVendorProfilePageState extends State<EditVendorProfilePage> {
                       : null),
             ),
             child: imageFile == null && (imageUrl == null || imageUrl.isEmpty)
-                ? const Center(child: Icon(Icons.add_a_photo_outlined, color: Colors.white24, size: 32))
+                ? Center(child: Icon(Icons.add_a_photo_outlined, color: iconDisabledColor, size: 32))
                 : null,
           ),
         ),
@@ -326,7 +335,7 @@ class _EditVendorProfilePageState extends State<EditVendorProfilePage> {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller, IconData icon, {TextInputType? keyboardType, int maxLines = 1}) {
+  Widget _buildTextField(String label, TextEditingController controller, IconData icon, Color surfaceColor, Color hintColor, Color iconColor, Color textColor, {TextInputType? keyboardType, int maxLines = 1}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 24),
       child: Column(
@@ -337,7 +346,7 @@ class _EditVendorProfilePageState extends State<EditVendorProfilePage> {
             style: GoogleFonts.outfit(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: Colors.white,
+              color: textColor,
             ),
           ),
           const SizedBox(height: 12),
@@ -345,13 +354,13 @@ class _EditVendorProfilePageState extends State<EditVendorProfilePage> {
             controller: controller,
             keyboardType: keyboardType,
             maxLines: maxLines,
-            style: const TextStyle(color: Colors.white),
+            style: TextStyle(color: textColor),
             decoration: InputDecoration(
               hintText: 'Enter $label',
-              hintStyle: const TextStyle(color: Colors.white10),
-              prefixIcon: Icon(icon, color: Colors.white54, size: 20),
+              hintStyle: TextStyle(color: hintColor),
+              prefixIcon: Icon(icon, color: iconColor, size: 20),
               filled: true,
-              fillColor: const Color(0xFF1E1E1E),
+              fillColor: surfaceColor,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
                 borderSide: BorderSide.none,

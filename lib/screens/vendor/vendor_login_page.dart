@@ -139,79 +139,112 @@ class _VendorLoginPageState extends State<VendorLoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
+    final subtextColor = isDark ? Colors.white60 : Colors.black54;
+    final surfaceColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[100]!;
+    final hintColor = isDark ? Colors.white30 : Colors.black38;
+    final iconColor = isDark ? Colors.white54 : Colors.black54;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).iconTheme.color),
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const SizedBox(height: 20),
                 // Header
-                const Center(
-                  child: AppLogo(size: 100, showBackground: false),
+                Center(
+                  child: Column(
+                    children: [
+                      Text(
+                        'ICuisine',
+                        style: GoogleFonts.outfit(
+                          fontSize: 44,
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xFFFA5211),
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Digitising Street Food',
+                        style: GoogleFonts.outfit(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w400,
+                          color: subtextColor,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 40),
                 Center(
                   child: Text(
                     'Vendor Login',
                     style: GoogleFonts.outfit(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      fontSize: 28,
+                      fontWeight: FontWeight.w700,
+                      color: textColor,
+                      letterSpacing: -0.3,
                     ),
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
                 Center(
                   child: Text(
                     'Welcome back! Login to manage your orders',
                     style: GoogleFonts.outfit(
-                      fontSize: 15,
-                      color: Colors.white60,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: subtextColor,
+                      height: 1.4,
                     ),
                     textAlign: TextAlign.center,
                   ),
                 ),
-                const SizedBox(height: 48),
+                const SizedBox(height: 36),
 
                 // Email Field
                 Text(
                   'Email Address',
                   style: GoogleFonts.outfit(
-                    fontSize: 16,
+                    fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                    color: textColor,
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  style: const TextStyle(color: Colors.white),
+                  style: TextStyle(color: textColor, fontSize: 15),
                   decoration: InputDecoration(
                     hintText: 'Enter your email',
-                    hintStyle: const TextStyle(color: Colors.white30),
-                    prefixIcon: const Icon(Icons.email_outlined, color: Colors.white54),
+                    hintStyle: TextStyle(color: hintColor, fontSize: 14),
+                    prefixIcon: Icon(Icons.email_outlined, color: iconColor, size: 22),
                     filled: true,
-                    fillColor: const Color(0xFF1E1E1E),
+                    fillColor: surfaceColor,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: const BorderSide(color: Color(0xFFFA5211), width: 1.5),
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: const BorderSide(color: Color(0xFFFA5211), width: 2),
                     ),
                   ),
                   validator: (value) {
@@ -224,42 +257,44 @@ class _VendorLoginPageState extends State<VendorLoginPage> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
 
                 // Password Field
                 Text(
                   'Password',
                   style: GoogleFonts.outfit(
-                    fontSize: 16,
+                    fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                    color: textColor,
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
                 TextFormField(
                   controller: _passwordController,
                   obscureText: _obscurePassword,
-                  style: const TextStyle(color: Colors.white),
+                  style: TextStyle(color: textColor, fontSize: 15),
                   decoration: InputDecoration(
                     hintText: 'Enter your password',
-                    hintStyle: const TextStyle(color: Colors.white30),
-                    prefixIcon: const Icon(Icons.lock_outlined, color: Colors.white54),
+                    hintStyle: TextStyle(color: hintColor, fontSize: 14),
+                    prefixIcon: Icon(Icons.lock_outlined, color: iconColor, size: 22),
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                        color: Colors.white54,
+                        color: iconColor,
+                        size: 22,
                       ),
                       onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                     ),
                     filled: true,
-                    fillColor: const Color(0xFF1E1E1E),
+                    fillColor: surfaceColor,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: const BorderSide(color: Color(0xFFFA5211), width: 1.5),
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: const BorderSide(color: Color(0xFFFA5211), width: 2),
                     ),
                   ),
                   validator: (value) {
@@ -272,110 +307,131 @@ class _VendorLoginPageState extends State<VendorLoginPage> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
 
                 // Forgot Password
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
                     onPressed: () {},
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
                     child: Text(
                       'Forgot Password?',
                       style: GoogleFonts.outfit(
                         color: const Color(0xFFFA5211),
                         fontWeight: FontWeight.w600,
+                        fontSize: 14,
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 28),
 
                 // Login Button
                 SizedBox(
                   width: double.infinity,
-                  height: 60,
+                  height: 56,
                   child: ElevatedButton(
                     onPressed: _isLoading ? null : _handleLogin,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFFA5211),
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(14),
                       ),
                       elevation: 0,
+                      shadowColor: const Color(0xFFFA5211).withOpacity(0.3),
                     ),
                     child: _isLoading
                         ? const SizedBox(
-                            height: 24,
-                            width: 24,
-                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                            height: 22,
+                            width: 22,
+                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
                           )
                         : Text(
                             'Login',
                             style: GoogleFonts.outfit(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                              fontSize: 17,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.3,
                             ),
                           ),
                   ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 28),
 
                 // Divider
                 Row(
                   children: [
-                    Expanded(child: Divider(color: Colors.white.withOpacity(0.1))),
+                    Expanded(child: Divider(color: isDark ? Colors.white.withOpacity(0.12) : Colors.black.withOpacity(0.12), thickness: 1)),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Text(
                         'OR',
-                        style: GoogleFonts.outfit(color: Colors.white30, fontWeight: FontWeight.w500),
+                        style: GoogleFonts.outfit(
+                          color: subtextColor, 
+                          fontWeight: FontWeight.w500,
+                          fontSize: 13,
+                          letterSpacing: 0.5,
+                        ),
                       ),
                     ),
-                    Expanded(child: Divider(color: Colors.white.withOpacity(0.1))),
+                    Expanded(child: Divider(color: isDark ? Colors.white.withOpacity(0.12) : Colors.black.withOpacity(0.12), thickness: 1)),
                   ],
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 28),
 
                 // Google Sign In
                 SizedBox(
                   width: double.infinity,
-                  height: 60,
+                  height: 56,
                   child: OutlinedButton(
                     onPressed: _isLoading ? null : _handleGoogleSignIn,
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      side: BorderSide(color: Colors.white.withOpacity(0.1)),
-                      backgroundColor: const Color(0xFF1E1E1E),
+                      foregroundColor: textColor,
+                      side: BorderSide(
+                        color: isDark ? Colors.white.withOpacity(0.15) : Colors.black.withOpacity(0.15),
+                        width: 1.5,
+                      ),
+                      backgroundColor: surfaceColor,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(14),
                       ),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const GoogleLogo(size: 24),
+                        const GoogleLogo(size: 22),
                         const SizedBox(width: 12),
                         Text(
                           'Sign in with Google',
                           style: GoogleFonts.outfit(
-                            fontSize: 16,
+                            fontSize: 15,
                             fontWeight: FontWeight.w600,
+                            letterSpacing: 0.2,
                           ),
                         ),
                       ],
                     ),
                   ),
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 32),
 
                 // Sign Up Link
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Don\'t have an account? ',
-                      style: GoogleFonts.outfit(color: Colors.white60, fontSize: 15),
+                      "Don't have an account? ",
+                      style: GoogleFonts.outfit(
+                        color: subtextColor, 
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
                     TextButton(
                       onPressed: () {
@@ -384,18 +440,23 @@ class _VendorLoginPageState extends State<VendorLoginPage> {
                           MaterialPageRoute(builder: (context) => const VendorSignupPage()),
                         );
                       },
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
                       child: Text(
                         'Sign Up',
                         style: GoogleFonts.outfit(
                           color: const Color(0xFFFA5211),
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 24),
               ],
             ),
           ),

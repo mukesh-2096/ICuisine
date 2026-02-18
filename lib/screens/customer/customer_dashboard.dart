@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:geolocator/geolocator.dart';
 import '../../services/auth_service.dart';
 import 'customer_profile_page.dart';
 import 'notification_page.dart';
@@ -11,6 +12,7 @@ import 'manage_addresses_page.dart';
 import 'cart_page.dart';
 import 'customer_vendor_menu_page.dart';
 import 'my_orders_page.dart';
+import 'nearby_vendors_map.dart';
 
 class CustomerDashboard extends StatefulWidget {
   const CustomerDashboard({super.key});
@@ -45,8 +47,13 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? const Color(0xFF121212) : Colors.grey[50]!;
+    final borderColor = isDark ? Colors.white10 : Colors.black12;
+    final unselectedColor = isDark ? Colors.white24 : Colors.black26;
+    
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+      backgroundColor: backgroundColor,
       body: Stack(
         children: [
           PageView(
@@ -62,15 +69,15 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
           ),
         ],
       ),
-      bottomNavigationBar: _buildBottomNav(),
+      bottomNavigationBar: _buildBottomNav(backgroundColor, borderColor, unselectedColor),
     );
   }
 
-  Widget _buildBottomNav() {
+  Widget _buildBottomNav(Color backgroundColor, Color borderColor, Color unselectedColor) {
     return Container(
-      decoration: const BoxDecoration(
-        color: Color(0xFF121212),
-        border: Border(top: BorderSide(color: Colors.white10, width: 0.5)),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        border: Border(top: BorderSide(color: borderColor, width: 0.5)),
       ),
       child: BottomNavigationBar(
         currentIndex: _currentIndex,
@@ -84,9 +91,9 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
             curve: Curves.easeInOut,
           );
         },
-        backgroundColor: const Color(0xFF121212),
+        backgroundColor: backgroundColor,
         selectedItemColor: const Color(0xFFFA5211),
-        unselectedItemColor: Colors.white24,
+        unselectedItemColor: unselectedColor,
         type: BottomNavigationBarType.fixed,
         elevation: 0,
         items: const [
@@ -102,6 +109,10 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
   }
 
   Widget _buildActiveOrderPin() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final surfaceColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[100]!;
+    final textColor = Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
+    
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return const SizedBox.shrink();
 
@@ -146,7 +157,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
             margin: const EdgeInsets.fromLTRB(15, 0, 15, 12),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             decoration: BoxDecoration(
-              color: const Color(0xFF1E1E1E),
+              color: surfaceColor,
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
                   color: const Color(0xFFFA5211).withOpacity(0.3), width: 1),
@@ -180,7 +191,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.outfit(
-                          color: Colors.white,
+                          color: textColor,
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
                         ),
@@ -245,7 +256,7 @@ class ExplorePage extends StatefulWidget {
 }
 
 class _ExplorePageState extends State<ExplorePage> {
-  bool _isVegOnly = false;
+  String _foodTypeFilter = 'both'; // 'both', 'veg', or 'non-veg'
   late PageController _pageController;
   Timer? _timer;
   int _currentPage = 0;
@@ -315,10 +326,21 @@ class _ExplorePageState extends State<ExplorePage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? const Color(0xFF121212) : Colors.grey[50]!;
+    final textColor = Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
+    final subtextColor = isDark ? Colors.white54 : Colors.black54;
+    final iconColor = isDark ? Colors.white70 : Colors.black54;
+    final surfaceColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[100]!;
+    final borderColor = isDark ? Colors.white10 : Colors.black12;
+    final searchBg = isDark ? Colors.white : Colors.grey[200]!;
+    final searchTextColor = const Color(0xFF1A1A1A);
+    final searchHintColor = isDark ? Colors.black26 : Colors.black38;
+    
     final user = FirebaseAuth.instance.currentUser;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+      backgroundColor: backgroundColor,
       body: SafeArea(
         child: StreamBuilder<DocumentSnapshot>(
           stream: user != null
@@ -332,7 +354,7 @@ class _ExplorePageState extends State<ExplorePage> {
             return RefreshIndicator(
               onRefresh: _handleRefresh,
               color: const Color(0xFFFA5211),
-              backgroundColor: const Color(0xFF1E1E1E),
+              backgroundColor: surfaceColor,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 child: Column(
@@ -343,7 +365,7 @@ class _ExplorePageState extends State<ExplorePage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildGreetingWithAvatar(context, userName),
+                        _buildGreetingWithAvatar(context, userName, surfaceColor, borderColor, iconColor, textColor),
                         const SizedBox(height: 10),
                         
                         StreamBuilder<QuerySnapshot>(
@@ -369,12 +391,12 @@ class _ExplorePageState extends State<ExplorePage> {
                                   Flexible(
                                     child: Text(
                                       addressText,
-                                      style: GoogleFonts.outfit(color: Colors.white54, fontSize: 12),
+                                      style: GoogleFonts.outfit(color: subtextColor, fontSize: 12),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
-                                  const Icon(Icons.keyboard_arrow_down, color: Colors.white54, size: 14),
+                                  const Icon(Icons.keyboard_arrow_down, size: 14),
                                 ],
                               ),
                             );
@@ -385,25 +407,25 @@ class _ExplorePageState extends State<ExplorePage> {
                         // Search Bar + Small Veg Toggle
                         Row(
                           children: [
-                            Expanded(child: _buildSearchBar()),
+                            Expanded(child: _buildSearchBar(searchBg, searchTextColor, searchHintColor)),
                             const SizedBox(width: 15),
-                            _buildVegToggle(),
+                            _buildVegToggle(surfaceColor, borderColor, textColor),
                           ],
                         ),
                         const SizedBox(height: 25),
 
-                        _buildSectionHeader('Categories', null),
+                        _buildSectionHeader('Categories', null, textColor),
                         const SizedBox(height: 15),
-                        _buildCategories(),
+                        _buildCategories(surfaceColor, borderColor, textColor),
                         const SizedBox(height: 30),
 
 
-                        _buildTrendingItems(),
+                        _buildTrendingItems(textColor, subtextColor),
                         const SizedBox(height: 30),
 
-                        _buildSectionHeader('Nearby Vendors', 'View Map'),
+                        _buildSectionHeader('Nearby Vendors', 'View Map', textColor),
                         const SizedBox(height: 15),
-                        _buildNearbyVendors(),
+                        _buildNearbyVendors(surfaceColor, borderColor, textColor, subtextColor),
                         const SizedBox(height: 20),
                       ],
                     ),
@@ -418,66 +440,204 @@ class _ExplorePageState extends State<ExplorePage> {
     );
   }
 
-  Widget _buildVegToggle() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            _isVegOnly ? 'VEG' : 'NON-VEG',
-            style: GoogleFonts.outfit(
-              color: _isVegOnly ? Colors.green : Colors.red,
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 4),
-          GestureDetector(
-            onTap: () => setState(() => _isVegOnly = !_isVegOnly),
-            child: Container(
-              width: 32,
-              height: 14,
-              padding: const EdgeInsets.all(2),
+  Widget _buildVegToggle(Color surfaceColor, Color borderColor, Color textColor) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final subtextColor = isDark ? Colors.white70 : Colors.black54;
+    final hintColor = isDark ? Colors.white38 : Colors.black38;
+    
+    return GestureDetector(
+      onTap: () => _showFoodTypeFilter(surfaceColor, textColor, subtextColor, hintColor, borderColor),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: surfaceColor,
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(color: borderColor),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 16,
+              height: 16,
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.05),
-                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: _foodTypeFilter == 'veg' 
+                      ? Colors.green 
+                      : _foodTypeFilter == 'non-veg'
+                          ? Colors.red
+                          : Colors.grey,
+                  width: 2,
+                ),
+                borderRadius: BorderRadius.circular(3),
               ),
-              child: Stack(
+              child: Center(
+                child: Container(
+                  width: 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: _foodTypeFilter == 'veg' 
+                        ? Colors.green 
+                        : _foodTypeFilter == 'non-veg'
+                            ? Colors.red
+                            : Colors.grey,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 6),
+            Icon(Icons.arrow_drop_down, color: textColor, size: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showFoodTypeFilter(Color surfaceColor, Color textColor, Color subtextColor, Color hintColor, Color borderColor) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: surfaceColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Filter Food Type',
+              style: GoogleFonts.outfit(
+                color: textColor,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 20),
+            _buildFilterOption(
+              'Both',
+              'Show all items',
+              'both',
+              Colors.grey,
+              surfaceColor,
+              textColor,
+              subtextColor,
+              borderColor,
+            ),
+            const SizedBox(height: 12),
+            _buildFilterOption(
+              'Veg',
+              'Vegetarian items only',
+              'veg',
+              Colors.green,
+              surfaceColor,
+              textColor,
+              subtextColor,
+              borderColor,
+            ),
+            const SizedBox(height: 12),
+            _buildFilterOption(
+              'Non-Veg',
+              'Non-vegetarian items only',
+              'non-veg',
+              Colors.red,
+              surfaceColor,
+              textColor,
+              subtextColor,
+              borderColor,
+            ),
+            const SizedBox(height: 10),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFilterOption(
+    String title,
+    String subtitle,
+    String value,
+    Color color,
+    Color surfaceColor,
+    Color textColor,
+    Color subtextColor,
+    Color borderColor,
+  ) {
+    final isSelected = _foodTypeFilter == value;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _foodTypeFilter = value;
+        });
+        Navigator.pop(context);
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isSelected ? color.withOpacity(0.1) : surfaceColor,
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(
+            color: isSelected ? color : borderColor,
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                border: Border.all(color: color, width: 2),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Center(
+                child: Container(
+                  width: 12,
+                  height: 12,
+                  decoration: BoxDecoration(
+                    color: color,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 15),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                   AnimatedAlign(
-                    duration: const Duration(milliseconds: 200),
-                    alignment: _isVegOnly ? Alignment.centerLeft : Alignment.centerRight,
-                    child: Container(
-                      width: 10,
-                      height: 10,
-                      decoration: BoxDecoration(
-                        color: _isVegOnly ? Colors.green : Colors.red,
-                        borderRadius: BorderRadius.circular(2),
-                        border: Border.all(color: _isVegOnly ? Colors.green : Colors.red, width: 1.5),
-                      ),
-                      child: Container(
-                        margin: const EdgeInsets.all(1),
-                        decoration: BoxDecoration(color: _isVegOnly ? Colors.green : Colors.red, shape: BoxShape.circle),
-                      ),
+                  Text(
+                    title,
+                    style: GoogleFonts.outfit(
+                      color: textColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: GoogleFonts.outfit(
+                      color: subtextColor,
+                      fontSize: 12,
                     ),
                   ),
                 ],
               ),
             ),
-          ),
-        ],
+            if (isSelected)
+              Icon(Icons.check_circle, color: color, size: 24),
+          ],
+        ),
       ),
     );
   }
 
 
 
-  Widget _buildGreetingWithAvatar(BuildContext context, String name) {
+  Widget _buildGreetingWithAvatar(BuildContext context, String name, Color surfaceColor, Color borderColor, Color iconColor, Color textColor) {
     String greeting = 'Good morning';
     int hour = DateTime.now().hour;
     if (hour >= 12 && hour < 17) greeting = 'Good afternoon';
@@ -489,7 +649,7 @@ class _ExplorePageState extends State<ExplorePage> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('$greeting 👋', style: GoogleFonts.outfit(color: Colors.white70, fontSize: 14)),
+            Text('$greeting 👋', style: GoogleFonts.outfit(color: iconColor, fontSize: 14)),
           ],
         ),
         GestureDetector(
@@ -499,11 +659,11 @@ class _ExplorePageState extends State<ExplorePage> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1E1E1E),
+                  color: surfaceColor,
                   borderRadius: BorderRadius.circular(15),
-                  border: Border.all(color: Colors.white10),
+                  border: Border.all(color: borderColor),
                 ),
-                child: const Icon(Icons.notifications_none, color: Colors.white, size: 22),
+                child: Icon(Icons.notifications_none, color: textColor, size: 22),
               ),
               if (_notifications.any((n) => !n['isRead']))
                 Positioned(
@@ -525,25 +685,25 @@ class _ExplorePageState extends State<ExplorePage> {
     );
   }
 
-  Widget _buildSearchBar() {
+  Widget _buildSearchBar(Color searchBg, Color searchTextColor, Color searchHintColor) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: searchBg,
         borderRadius: BorderRadius.circular(15),
       ),
       child: Row(
         children: [
-          const Icon(Icons.search, color: Colors.black26, size: 24),
+          Icon(Icons.search, color: searchHintColor, size: 24),
           const SizedBox(width: 10),
           Expanded(
             child: TextField(
               readOnly: true,
               onTap: () => _animatedNav(context, const SearchPage()),
-              style: const TextStyle(color: Colors.black),
+              style: TextStyle(color: searchTextColor),
               decoration: InputDecoration(
                 hintText: 'Search for \'ICuisine\'',
-                hintStyle: GoogleFonts.outfit(color: Colors.black26, fontSize: 16),
+                hintStyle: GoogleFonts.outfit(color: searchHintColor, fontSize: 16),
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(vertical: 15),
               ),
@@ -554,14 +714,21 @@ class _ExplorePageState extends State<ExplorePage> {
     );
   }
 
-  Widget _buildSectionHeader(String title, String? actionText) {
+  Widget _buildSectionHeader(String title, String? actionText, Color textColor) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(title, style: GoogleFonts.outfit(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+        Text(title, style: GoogleFonts.outfit(color: textColor, fontSize: 20, fontWeight: FontWeight.bold)),
         if (actionText != null)
           TextButton(
-            onPressed: () {},
+            onPressed: () {
+              if (actionText == 'View Map') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => NearbyVendorsMap()),
+                );
+              }
+            },
             child: Row(
               children: [
                 Text(actionText, style: GoogleFonts.outfit(color: const Color(0xFFFA5211), fontWeight: FontWeight.w600)),
@@ -573,7 +740,7 @@ class _ExplorePageState extends State<ExplorePage> {
     );
   }
 
-  Widget _buildCategories() {
+  Widget _buildCategories(Color surfaceColor, Color borderColor, Color textColor) {
     final categories = [
       {'name': 'Main Course', 'icon': '🍳', 'color': Colors.orange},
       {'name': 'Snacks', 'icon': '🍔', 'color': Colors.red},
@@ -591,9 +758,9 @@ class _ExplorePageState extends State<ExplorePage> {
             width: 85,
             margin: const EdgeInsets.only(right: 15),
             decoration: BoxDecoration(
-              color: const Color(0xFF1E1E1E),
+              color: surfaceColor,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.white10),
+              border: Border.all(color: borderColor),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -612,7 +779,7 @@ class _ExplorePageState extends State<ExplorePage> {
                 const SizedBox(height: 8),
                 Text(
                   categories[index]['name'] as String,
-                  style: GoogleFonts.outfit(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w500),
+                  style: GoogleFonts.outfit(color: textColor, fontSize: 11, fontWeight: FontWeight.w500),
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -623,11 +790,11 @@ class _ExplorePageState extends State<ExplorePage> {
     );
   }
 
-  Widget _buildTrendingItems() {
+  Widget _buildTrendingItems(Color textColor, Color subtextColor) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionHeader('Today\'s Specials', null),
+        _buildSectionHeader('Today\'s Specials', null, textColor),
         const SizedBox(height: 15),
         SizedBox(
           height: 200,
@@ -636,7 +803,7 @@ class _ExplorePageState extends State<ExplorePage> {
                 .collectionGroup('menu')
                 .where('isTodaySpecial', isEqualTo: true)
                 .where('isAvailable', isEqualTo: true)
-                .limit(10)
+                .limit(20)
                 .snapshots(),
             builder: (context, snapshot) {
               if (snapshot.hasError) {
@@ -659,11 +826,29 @@ class _ExplorePageState extends State<ExplorePage> {
 
               if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                 return Center(
-                  child: Text('No specials today. Check back later!', style: GoogleFonts.outfit(color: Colors.white38)),
+                  child: Text('No specials today. Check back later!', style: GoogleFonts.outfit(color: subtextColor)),
                 );
               }
 
-              final items = snapshot.data!.docs;
+              // Filter items based on food type selection
+              var allItems = snapshot.data!.docs;
+              final items = _foodTypeFilter == 'both'
+                  ? allItems
+                  : allItems.where((doc) {
+                      final data = doc.data() as Map<String, dynamic>;
+                      return data['itemType'] == _foodTypeFilter;
+                    }).toList();
+
+              if (items.isEmpty) {
+                return Center(
+                  child: Text(
+                    _foodTypeFilter == 'veg'
+                        ? 'No vegetarian specials today'
+                        : 'No non-vegetarian specials today',
+                    style: GoogleFonts.outfit(color: subtextColor),
+                  ),
+                );
+              }
 
               return PageView.builder(
                 controller: _pageController,
@@ -730,6 +915,36 @@ class _ExplorePageState extends State<ExplorePage> {
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+                                  // Veg/Non-Veg Indicator at top
+                                  if (item['itemType'] != null)
+                                    Padding(
+                                      padding: const EdgeInsets.only(bottom: 8),
+                                      child: Container(
+                                        width: 24,
+                                        height: 24,
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                            color: item['itemType'] == 'veg' 
+                                                ? Colors.green 
+                                                : Colors.red,
+                                            width: 2,
+                                          ),
+                                          borderRadius: BorderRadius.circular(4),
+                                        ),
+                                        child: Center(
+                                          child: Container(
+                                            width: 12,
+                                            height: 12,
+                                            decoration: BoxDecoration(
+                                              color: item['itemType'] == 'veg' 
+                                                  ? Colors.green 
+                                                  : Colors.red,
+                                              shape: BoxShape.circle,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
                                   Text(
                                     item['name'] ?? 'Unknown',
                                     style: GoogleFonts.outfit(
@@ -763,6 +978,26 @@ class _ExplorePageState extends State<ExplorePage> {
                                           style: GoogleFonts.outfit(color: Colors.black, fontSize: 10, fontWeight: FontWeight.bold),
                                         ),
                                       ),
+                                      if (item['preparationTime'] != null) ...[
+                                        const SizedBox(width: 8),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white.withOpacity(0.2),
+                                            borderRadius: BorderRadius.circular(5),
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              const Icon(Icons.timer_outlined, color: Colors.white, size: 12),
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                '${item['preparationTime']} min',
+                                                style: GoogleFonts.outfit(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
                                     ],
                                   ),
                                 ],
@@ -783,140 +1018,293 @@ class _ExplorePageState extends State<ExplorePage> {
     );
   }
 
-  Widget _buildNearbyVendors() {
+  Widget _buildNearbyVendors(Color surfaceColor, Color borderColor, Color textColor, Color subtextColor) {
+    final user = FirebaseAuth.instance.currentUser;
+    
+    if (user == null) {
+      return Center(
+        child: Text('Please login to view nearby vendors', style: GoogleFonts.outfit(color: subtextColor)),
+      );
+    }
+
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
-          .collection('vendors')
-          // .where('hasLiveItems', isEqualTo: true) // Temporarily disabled for debugging
+          .collection('customers')
+          .doc(user.uid)
+          .collection('addresses')
+          .where('isDefault', isEqualTo: true)
+          .limit(1)
           .snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
+      builder: (context, addressSnapshot) {
+        if (addressSnapshot.hasError) {
           return Center(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Text('Error loading nearby vendors: ${snapshot.error}', style: const TextStyle(color: Colors.red)),
+              child: Text('Error loading address: ${addressSnapshot.error}', style: const TextStyle(color: Colors.red)),
             ),
           );
         }
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator(color: Color(0xFFFA5211)));
+
+        // Check if customer has a default address
+        if (!addressSnapshot.hasData || addressSnapshot.data!.docs.isEmpty) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                children: [
+                  Icon(Icons.location_off, size: 60, color: subtextColor.withOpacity(0.5)),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No Default Address Set',
+                    style: GoogleFonts.outfit(color: textColor, fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Please add a default address to see nearby vendors',
+                    style: GoogleFonts.outfit(color: subtextColor, fontSize: 14),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const ManageAddressesPage()),
+                      );
+                    },
+                    icon: const Icon(Icons.add_location, color: Colors.white),
+                    label: Text('Add Address', style: GoogleFonts.outfit(color: Colors.white)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFFA5211),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
         }
 
-        final vendors = snapshot.data!.docs;
+        // Get customer's default address location
+        final addressData = addressSnapshot.data!.docs.first.data() as Map<String, dynamic>;
+        final customerLocation = addressData['location'] as Map<String, dynamic>?;
         
-        return Column(
-          children: [
-            if (vendors.isEmpty)
-              Center(
+        if (customerLocation == null || customerLocation['latitude'] == null || customerLocation['longitude'] == null) {
+          return Center(
+            child: Text('Invalid address location', style: GoogleFonts.outfit(color: Colors.red)),
+          );
+        }
+
+        final customerLat = customerLocation['latitude'] as double;
+        final customerLng = customerLocation['longitude'] as double;
+
+        return StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection('vendors')
+              .snapshots(),
+          builder: (context, vendorSnapshot) {
+            if (vendorSnapshot.hasError) {
+              return Center(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  child: Column(
-                    children: [
-                      Text("No vendors found in database.", style: GoogleFonts.outfit(color: Colors.redAccent)),
-                      const SizedBox(height: 8),
-                      Text("Collection: 'vendors'", style: GoogleFonts.outfit(color: Colors.white24, fontSize: 10)),
-                    ],
-                  ),
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text('Error loading vendors: ${vendorSnapshot.error}', style: const TextStyle(color: Colors.red)),
                 ),
-              )
-            else
-              Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Showing ${vendors.length} vendors found",
-                    style: GoogleFonts.outfit(color: Colors.white24, fontSize: 10),
-                  ),
-                ),
-              ),
+              );
+            }
+            if (vendorSnapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator(color: Color(0xFFFA5211)));
+            }
+
+            final allVendors = vendorSnapshot.data!.docs;
             
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: vendors.length,
-              itemBuilder: (context, index) {
-                final vendor = vendors[index].data() as Map<String, dynamic>;
-                final vendorId = vendors[index].id;
-                final vendorName = vendor['businessName'] ?? 'Unknown Vendor';
-                final vendorImage = vendor['businessImage'] ?? '';
-                final vendorAddress = vendor['businessAddress'] ?? 'Address not available';
-                final isLive = vendor['hasLiveItems'] == true;
+            // Filter and sort vendors by distance
+            List<Map<String, dynamic>> nearbyVendors = [];
+            
+            for (var vendorDoc in allVendors) {
+              final vendor = vendorDoc.data() as Map<String, dynamic>;
+              final vendorLocation = vendor['location'] as Map<String, dynamic>?;
+              
+              if (vendorLocation != null && 
+                  vendorLocation['latitude'] != null && 
+                  vendorLocation['longitude'] != null) {
+                final vendorLat = vendorLocation['latitude'] as double;
+                final vendorLng = vendorLocation['longitude'] as double;
                 
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context, 
-                      MaterialPageRoute(builder: (context) => CustomerVendorMenuPage(
-                        vendorId: vendorId, 
-                        vendorName: vendorName,
-                        vendorImage: vendorImage
-                      ))
-                    );
-                  },
-                  child: Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    width: double.infinity, padding: const EdgeInsets.all(15),
-                    decoration: BoxDecoration(color: const Color(0xFF1E1E1E), borderRadius: BorderRadius.circular(20), border: Border.all(color: Colors.white10)),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 60,
-                          height: 60,
-                          padding: const EdgeInsets.all(0),
-                          decoration: BoxDecoration(color: Colors.blue.withOpacity(0.1), borderRadius: BorderRadius.circular(15)),
-                          child: vendorImage.isNotEmpty 
-                            ? ClipRRect(borderRadius: BorderRadius.circular(15), child: Image.network(vendorImage, fit: BoxFit.cover))
-                            : const Icon(Icons.store, color: Colors.blue, size: 30),
+                // Calculate distance in meters
+                final distance = Geolocator.distanceBetween(
+                  customerLat,
+                  customerLng,
+                  vendorLat,
+                  vendorLng,
+                );
+                
+                // Filter vendors within 50km
+                if (distance <= 50000) {
+                  nearbyVendors.add({
+                    'doc': vendorDoc,
+                    'data': vendor,
+                    'distance': distance,
+                  });
+                }
+              }
+            }
+            
+            // Sort by distance
+            nearbyVendors.sort((a, b) => (a['distance'] as double).compareTo(b['distance'] as double));
+            
+            return Column(
+              children: [
+                if (nearbyVendors.isEmpty)
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      child: Column(
+                        children: [
+                          Icon(Icons.store_mall_directory_outlined, size: 60, color: subtextColor.withOpacity(0.5)),
+                          const SizedBox(height: 12),
+                          Text(
+                            "No vendors found within 50km",
+                            style: GoogleFonts.outfit(color: textColor, fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            "Try changing your default address",
+                            style: GoogleFonts.outfit(color: subtextColor, fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                else
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "Found ${nearbyVendors.length} vendor${nearbyVendors.length == 1 ? '' : 's'} within 50km",
+                        style: GoogleFonts.outfit(color: subtextColor, fontSize: 10),
+                      ),
+                    ),
+                  ),
+                
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: nearbyVendors.length,
+                  itemBuilder: (context, index) {
+                    final vendorMap = nearbyVendors[index];
+                    final vendor = vendorMap['data'] as Map<String, dynamic>;
+                    final vendorId = (vendorMap['doc'] as DocumentSnapshot).id;
+                    final distance = vendorMap['distance'] as double;
+                    
+                    final vendorName = vendor['businessName'] ?? 'Unknown Vendor';
+                    final vendorImage = vendor['businessImage'] ?? '';
+                    
+                    // Format distance
+                    String distanceText;
+                    if (distance < 1000) {
+                      distanceText = '${distance.toStringAsFixed(0)}m away';
+                    } else {
+                      distanceText = '${(distance / 1000).toStringAsFixed(1)}km away';
+                    }
+                    
+                    final isLive = vendor['hasLiveItems'] == true;
+                    
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context, 
+                          MaterialPageRoute(builder: (context) => CustomerVendorMenuPage(
+                            vendorId: vendorId, 
+                            vendorName: vendorName,
+                            vendorImage: vendorImage
+                          ))
+                        );
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(15),
+                        decoration: BoxDecoration(
+                          color: surfaceColor,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: borderColor),
                         ),
-                        const SizedBox(width: 15),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(vendorName, style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                              const SizedBox(height: 4),
-                              Row(
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 60,
+                              height: 60,
+                              padding: const EdgeInsets.all(0),
+                              decoration: BoxDecoration(
+                                color: Colors.blue.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              child: vendorImage.isNotEmpty 
+                                ? ClipRRect(
+                                    borderRadius: BorderRadius.circular(15),
+                                    child: Image.network(vendorImage, fit: BoxFit.cover),
+                                  )
+                                : const Icon(Icons.store, color: Colors.blue, size: 30),
+                            ),
+                            const SizedBox(width: 15),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Icon(Icons.location_on, size: 12, color: Colors.white54),
-                                  const SizedBox(width: 4),
-                                  Expanded(
+                                  Text(
+                                    vendorName,
+                                    style: GoogleFonts.outfit(
+                                      color: textColor,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      Icon(Icons.location_on, size: 12, color: const Color(0xFFFA5211)),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        distanceText,
+                                        style: GoogleFonts.outfit(
+                                          color: const Color(0xFFFA5211),
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: isLive ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
                                     child: Text(
-                                      vendorAddress,
-                                      style: GoogleFonts.outfit(color: Colors.white70, fontSize: 12),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
+                                      isLive ? "● LIVE" : "○ OFFLINE",
+                                      style: GoogleFonts.outfit(
+                                        color: isLive ? Colors.greenAccent : Colors.redAccent,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 4),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: isLive ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: Text(
-                                  isLive ? "● LIVE" : "○ OFFLINE",
-                                  style: GoogleFonts.outfit(
-                                    color: isLive ? Colors.greenAccent : Colors.redAccent,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                            Icon(Icons.chevron_right, color: subtextColor),
+                          ],
                         ),
-                        const Icon(Icons.chevron_right, color: Colors.white24),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
-          ],
+                      ),
+                    );
+                  },
+                ),
+              ],
+            );
+          },
         );
       },
     );

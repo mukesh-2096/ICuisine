@@ -142,13 +142,23 @@ class _CustomerSignupPageState extends State<CustomerSignupPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? const Color(0xFF121212) : Colors.grey[50]!;
+    final surfaceColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[100]!;
+    final textColor = isDark ? Colors.white : Colors.black87;
+    final subtextColor = isDark ? Colors.white60 : Colors.black54;
+    final hintColor = isDark ? Colors.white30 : Colors.black38;
+    final iconColor = isDark ? Colors.white54 : Colors.black54;
+    final borderColor = isDark ? Colors.white.withOpacity(0.1) : Colors.grey[300]!;
+    final checkboxBorderColor = isDark ? Colors.white54 : Colors.black54;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+      backgroundColor: backgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: textColor),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -161,8 +171,29 @@ class _CustomerSignupPageState extends State<CustomerSignupPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Header
-                const Center(
-                  child: AppLogo(size: 100, showBackground: false),
+                Center(
+                  child: Column(
+                    children: [
+                      Text(
+                        'ICuisine',
+                        style: GoogleFonts.outfit(
+                          fontSize: 48,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFFFA5211),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Digitising Street Food',
+                        style: GoogleFonts.outfit(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: textColor.withOpacity(0.7),
+                          letterSpacing: 1.2,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 32),
                 Center(
@@ -171,7 +202,7 @@ class _CustomerSignupPageState extends State<CustomerSignupPage> {
                     style: GoogleFonts.outfit(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: textColor,
                     ),
                   ),
                 ),
@@ -181,18 +212,18 @@ class _CustomerSignupPageState extends State<CustomerSignupPage> {
                     'Join us and enjoy delicious street food',
                     style: GoogleFonts.outfit(
                       fontSize: 15,
-                      color: Colors.white60,
+                      color: subtextColor,
                     ),
                   ),
                 ),
                 const SizedBox(height: 48),
 
                 // Full Name
-                _buildLabel('Full Name'),
+                _buildLabel('Full Name', textColor),
                 TextFormField(
                   controller: _nameController,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: _buildInputDecoration('Enter your full name', Icons.person_outline),
+                  style: TextStyle(color: textColor),
+                  decoration: _buildInputDecoration('Enter your full name', Icons.person_outline, surfaceColor, hintColor, iconColor),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your name';
@@ -203,12 +234,12 @@ class _CustomerSignupPageState extends State<CustomerSignupPage> {
                 const SizedBox(height: 24),
 
                 // Email
-                _buildLabel('Email Address'),
+                _buildLabel('Email Address', textColor),
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: _buildInputDecoration('Enter your email', Icons.email_outlined),
+                  style: TextStyle(color: textColor),
+                  decoration: _buildInputDecoration('Enter your email', Icons.email_outlined, surfaceColor, hintColor, iconColor),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your email';
@@ -222,12 +253,12 @@ class _CustomerSignupPageState extends State<CustomerSignupPage> {
                 const SizedBox(height: 24),
 
                 // Phone Number
-                _buildLabel('Phone Number'),
+                _buildLabel('Phone Number', textColor),
                 TextFormField(
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: _buildInputDecoration('Enter your phone number', Icons.phone_outlined),
+                  style: TextStyle(color: textColor),
+                  decoration: _buildInputDecoration('Enter your phone number', Icons.phone_outlined, surfaceColor, hintColor, iconColor),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your phone number';
@@ -241,18 +272,21 @@ class _CustomerSignupPageState extends State<CustomerSignupPage> {
                 const SizedBox(height: 24),
 
                 // Password
-                _buildLabel('Password'),
+                _buildLabel('Password', textColor),
                 TextFormField(
                   controller: _passwordController,
                   obscureText: _obscurePassword,
-                  style: const TextStyle(color: Colors.white),
+                  style: TextStyle(color: textColor),
                   decoration: _buildInputDecoration(
                     'Create a password',
                     Icons.lock_outlined,
+                    surfaceColor,
+                    hintColor,
+                    iconColor,
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                        color: Colors.white54,
+                        color: iconColor,
                       ),
                       onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                     ),
@@ -270,18 +304,21 @@ class _CustomerSignupPageState extends State<CustomerSignupPage> {
                 const SizedBox(height: 24),
 
                 // Confirm Password
-                _buildLabel('Confirm Password'),
+                _buildLabel('Confirm Password', textColor),
                 TextFormField(
                   controller: _confirmPasswordController,
                   obscureText: _obscureConfirmPassword,
-                  style: const TextStyle(color: Colors.white),
+                  style: TextStyle(color: textColor),
                   decoration: _buildInputDecoration(
                     'Confirm your password',
                     Icons.lock_outlined,
+                    surfaceColor,
+                    hintColor,
+                    iconColor,
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscureConfirmPassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                        color: Colors.white54,
+                        color: iconColor,
                       ),
                       onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
                     ),
@@ -300,7 +337,7 @@ class _CustomerSignupPageState extends State<CustomerSignupPage> {
 
                 // Terms and Conditions
                 Theme(
-                  data: ThemeData(unselectedWidgetColor: Colors.white54),
+                  data: ThemeData(unselectedWidgetColor: checkboxBorderColor),
                   child: Row(
                     children: [
                       Checkbox(
@@ -311,14 +348,14 @@ class _CustomerSignupPageState extends State<CustomerSignupPage> {
                           });
                         },
                         activeColor: const Color(0xFFFA5211),
-                        side: const BorderSide(color: Colors.white54),
+                        side: BorderSide(color: checkboxBorderColor),
                       ),
                       Expanded(
                         child: Text(
                           'I accept the Terms and Conditions',
                           style: GoogleFonts.outfit(
                             fontSize: 14,
-                            color: Colors.white70,
+                            color: subtextColor,
                           ),
                         ),
                       ),
@@ -361,15 +398,15 @@ class _CustomerSignupPageState extends State<CustomerSignupPage> {
                 // Divider
                 Row(
                   children: [
-                    Expanded(child: Divider(color: Colors.white.withOpacity(0.1))),
+                    Expanded(child: Divider(color: borderColor)),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
                         'OR',
-                        style: GoogleFonts.outfit(color: Colors.white30, fontWeight: FontWeight.w500),
+                        style: GoogleFonts.outfit(color: hintColor, fontWeight: FontWeight.w500),
                       ),
                     ),
-                    Expanded(child: Divider(color: Colors.white.withOpacity(0.1))),
+                    Expanded(child: Divider(color: borderColor)),
                   ],
                 ),
                 const SizedBox(height: 32),
@@ -381,9 +418,9 @@ class _CustomerSignupPageState extends State<CustomerSignupPage> {
                   child: OutlinedButton(
                     onPressed: _isLoading ? null : _handleGoogleSignIn,
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      side: BorderSide(color: Colors.white.withOpacity(0.1)),
-                      backgroundColor: const Color(0xFF1E1E1E),
+                      foregroundColor: textColor,
+                      side: BorderSide(color: borderColor),
+                      backgroundColor: surfaceColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
@@ -412,7 +449,7 @@ class _CustomerSignupPageState extends State<CustomerSignupPage> {
                   children: [
                     Text(
                       'Already have an account? ',
-                      style: GoogleFonts.outfit(color: Colors.white60, fontSize: 15),
+                      style: GoogleFonts.outfit(color: subtextColor, fontSize: 15),
                     ),
                     TextButton(
                       onPressed: () {
@@ -438,7 +475,7 @@ class _CustomerSignupPageState extends State<CustomerSignupPage> {
     );
   }
 
-  Widget _buildLabel(String text) {
+  Widget _buildLabel(String text, Color textColor) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Text(
@@ -446,20 +483,20 @@ class _CustomerSignupPageState extends State<CustomerSignupPage> {
         style: GoogleFonts.outfit(
           fontSize: 16,
           fontWeight: FontWeight.w600,
-          color: Colors.white,
+          color: textColor,
         ),
       ),
     );
   }
 
-  InputDecoration _buildInputDecoration(String hint, IconData icon, {Widget? suffixIcon}) {
+  InputDecoration _buildInputDecoration(String hint, IconData icon, Color surfaceColor, Color hintColor, Color iconColor, {Widget? suffixIcon}) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: const TextStyle(color: Colors.white30),
-      prefixIcon: Icon(icon, color: Colors.white54),
+      hintStyle: TextStyle(color: hintColor),
+      prefixIcon: Icon(icon, color: iconColor),
       suffixIcon: suffixIcon,
       filled: true,
-      fillColor: const Color(0xFF1E1E1E),
+      fillColor: surfaceColor,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
         borderSide: BorderSide.none,

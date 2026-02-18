@@ -10,12 +10,21 @@ class ViewMenuPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? const Color(0xFF121212) : Colors.grey[50]!;
+    final textColor = Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
+    final subtextColor = isDark ? Colors.white38 : Colors.black54;
+    final surfaceColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[100]!;
+    final borderColor = isDark ? Colors.white10 : Colors.black12;
+    final iconDisabledColor = isDark ? Colors.white10 : Colors.black12;
+    final iconColor = isDark ? Colors.white24 : Colors.black26;
+    
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
       return Scaffold(
-        backgroundColor: const Color(0xFF121212),
-        body: Center(child: Text('Please login to view menu', style: GoogleFonts.outfit(color: Colors.white70))),
+        backgroundColor: backgroundColor,
+        body: Center(child: Text('Please login to view menu', style: GoogleFonts.outfit(color: subtextColor))),
       );
     }
 
@@ -31,15 +40,15 @@ class ViewMenuPage extends StatelessWidget {
     menuQuery = menuQuery.orderBy('createdAt', descending: true);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+      backgroundColor: backgroundColor,
       appBar: AppBar(
         title: Text(
           showOnlyTodaySpecial ? "Today's Specials" : 'My Menu',
-          style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: Colors.white),
+          style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: textColor),
         ),
-        backgroundColor: const Color(0xFF121212),
+        backgroundColor: backgroundColor,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: textColor),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: menuQuery.snapshots(),
@@ -57,16 +66,16 @@ class ViewMenuPage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.restaurant_menu, size: 80, color: Colors.white10),
+                  Icon(Icons.restaurant_menu, size: 80, color: iconDisabledColor),
                   const SizedBox(height: 20),
                   Text(
                     'No menu items yet',
-                    style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+                    style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.bold, color: textColor),
                   ),
                   const SizedBox(height: 10),
                   Text(
                     'Tell your customers what you offer!',
-                    style: GoogleFonts.outfit(color: Colors.white38),
+                    style: GoogleFonts.outfit(color: subtextColor),
                   ),
                   const SizedBox(height: 30),
                   ElevatedButton.icon(
@@ -100,9 +109,9 @@ class ViewMenuPage extends StatelessWidget {
               return Container(
                 margin: const EdgeInsets.only(bottom: 16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1E1E1E),
+                  color: surfaceColor,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.white10),
+                  border: Border.all(color: borderColor),
                 ),
                 child: ListTile(
                   contentPadding: const EdgeInsets.all(12),
@@ -120,7 +129,7 @@ class ViewMenuPage extends StatelessWidget {
                           : null,
                     ),
                     child: data['image'] == null || data['image'].toString().isEmpty
-                        ? const Icon(Icons.fastfood, color: Colors.white24)
+                        ? Icon(Icons.fastfood, color: iconColor)
                         : null,
                   ),
                   title: Row(
@@ -128,7 +137,7 @@ class ViewMenuPage extends StatelessWidget {
                       Expanded(
                         child: Text(
                           data['name'] ?? 'Unnamed Item',
-                          style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
+                          style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 16, color: textColor),
                         ),
                       ),
                       if (data['isTodaySpecial'] == true)
@@ -154,7 +163,7 @@ class ViewMenuPage extends StatelessWidget {
                         data['description'] ?? 'No description',
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.outfit(color: Colors.white38, fontSize: 13),
+                        style: GoogleFonts.outfit(color: subtextColor, fontSize: 13),
                       ),
                       const SizedBox(height: 8),
                       Text(
@@ -191,16 +200,22 @@ class ViewMenuPage extends StatelessWidget {
   }
 
   void _deleteItem(BuildContext context, String vendorId, String itemId) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final surfaceColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[100]!;
+    final textColor = Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
+    final subtextColor = isDark ? Colors.white70 : Colors.black54;
+    final iconColor = isDark ? Colors.white38 : Colors.black45;
+    
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E1E),
-        title: Text('Delete Item', style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold)),
-        content: Text('Are you sure you want to remove this item from your menu?', style: GoogleFonts.outfit(color: Colors.white70)),
+        backgroundColor: surfaceColor,
+        title: Text('Delete Item', style: GoogleFonts.outfit(color: textColor, fontWeight: FontWeight.bold)),
+        content: Text('Are you sure you want to remove this item from your menu?', style: GoogleFonts.outfit(color: subtextColor)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancel', style: GoogleFonts.outfit(color: Colors.white38)),
+            child: Text('Cancel', style: GoogleFonts.outfit(color: iconColor)),
           ),
           TextButton(
             onPressed: () async {

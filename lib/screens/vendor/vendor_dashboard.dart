@@ -108,7 +108,6 @@ class _VendorDashboardState extends State<VendorDashboard> {
           'name': 'Owner Name',
           'businessName': 'Business Name',
           'businessCategory': 'Category',
-          'address': 'Address',
           'phone': 'Phone',
           'bankAccount': 'Bank Details',
           'upiId': 'UPI ID',
@@ -116,6 +115,12 @@ class _VendorDashboardState extends State<VendorDashboard> {
           'businessImage': 'Business Image',
           'profileImage': 'Profile Image',
         };
+        
+        // Check for location separately
+        final location = data?['location'] as Map<String, dynamic>?;
+        if (location == null || location['latitude'] == null || location['longitude'] == null) {
+          missingFields.add('Shop Location');
+        }
 
         requiredFields.forEach((key, label) {
           if (data?[key] == null || data![key].toString().trim().isEmpty) {
@@ -154,7 +159,11 @@ class _VendorDashboardState extends State<VendorDashboard> {
             _notifications = newNotifications;
           });
           
-          bool criticalMissing = data?['address'] == null || data?['businessImage'] == null || data?['businessName'] == null;
+          // Check critical missing fields (location, business image, business name)
+          final location = data?['location'] as Map<String, dynamic>?;
+          bool criticalMissing = (location == null || location['latitude'] == null || location['longitude'] == null) 
+              || data?['businessImage'] == null 
+              || data?['businessName'] == null;
           if (criticalMissing) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               _showWelcomeDialog();
@@ -166,14 +175,19 @@ class _VendorDashboardState extends State<VendorDashboard> {
   }
 
   void _showWelcomeDialog() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final surfaceColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[100]!;
+    final textColor = Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
+    final subtextColor = isDark ? Colors.white70 : Colors.black54;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E1E),
-        title: Text('Welcome, Partner! 🎉', style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold)),
+        backgroundColor: surfaceColor,
+        title: Text('Welcome, Partner! 🎉', style: GoogleFonts.outfit(color: textColor, fontWeight: FontWeight.bold)),
         content: Text(
-          'Thank you for joining iCuisine.\n\nTo get started, please go to your Profile and update:\n- Business Address\n- Business Image\n- Opening Hours\n\nThis helps customers find you easily!',
-          style: GoogleFonts.outfit(color: Colors.white70),
+          'Thank you for joining iCuisine.\n\nTo get started, please go to your Profile and update:\n- Shop Location (tap on map)\n- Business Image\n- Opening Hours\n\nThis helps customers find you easily!',
+          style: GoogleFonts.outfit(color: subtextColor),
         ),
         actions: [
           TextButton(
@@ -188,7 +202,7 @@ class _VendorDashboardState extends State<VendorDashboard> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Later', style: GoogleFonts.outfit(color: Colors.white38)),
+            child: Text('Later', style: GoogleFonts.outfit(color: isDark ? Colors.white38 : Colors.black45)),
           ),
         ],
       ),
@@ -196,6 +210,13 @@ class _VendorDashboardState extends State<VendorDashboard> {
   }
 
   void _showNotifications() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = Theme.of(context).scaffoldBackgroundColor;
+    final textColor = Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
+    final subtextColor = isDark ? Colors.white60 : Colors.black54;
+    final iconDisabledColor = isDark ? Colors.white24 : Colors.black26;
+    final borderColor = isDark ? Colors.white10 : Colors.black12;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -203,9 +224,9 @@ class _VendorDashboardState extends State<VendorDashboard> {
       builder: (context) => StatefulBuilder(
         builder: (context, setModalState) => Container(
           padding: const EdgeInsets.all(24),
-          decoration: const BoxDecoration(
-            color: Color(0xFF121212),
-            borderRadius: BorderRadius.only(
+          decoration: BoxDecoration(
+            color: backgroundColor,
+            borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(30),
               topRight: Radius.circular(30),
             ),
@@ -219,7 +240,7 @@ class _VendorDashboardState extends State<VendorDashboard> {
                 children: [
                    Text(
                     'Notifications',
-                    style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
+                    style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.bold, color: textColor),
                   ),
                   if (_notifications.isNotEmpty)
                     TextButton(
@@ -242,9 +263,9 @@ class _VendorDashboardState extends State<VendorDashboard> {
                   child: Center(
                     child: Column(
                       children: [
-                        const Icon(Icons.notifications_off_outlined, size: 60, color: Colors.white24),
+                        Icon(Icons.notifications_off_outlined, size: 60, color: iconDisabledColor),
                         const SizedBox(height: 15),
-                        Text('No new notifications', style: GoogleFonts.outfit(color: Colors.white38)),
+                        Text('No new notifications', style: GoogleFonts.outfit(color: subtextColor)),
                       ],
                     ),
                   ),
@@ -254,7 +275,7 @@ class _VendorDashboardState extends State<VendorDashboard> {
                   child: ListView.separated(
                     shrinkWrap: true,
                     itemCount: _notifications.length,
-                    separatorBuilder: (context, index) => Divider(color: Colors.white10, height: 24),
+                    separatorBuilder: (context, index) => Divider(color: borderColor, height: 24),
                     itemBuilder: (context, index) {
                       final item = _notifications[index];
                       bool isRead = item['isRead'] ?? false;
@@ -263,12 +284,12 @@ class _VendorDashboardState extends State<VendorDashboard> {
                         leading: Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: isRead ? Colors.white.withOpacity(0.05) : const Color(0xFFFA5211).withOpacity(0.1),
+                            color: isRead ? (isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.03)) : const Color(0xFFFA5211).withOpacity(0.1),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
                             item['type'] == 'profile' ? Icons.person_outline : Icons.restaurant_menu_outlined,
-                            color: isRead ? Colors.white38 : const Color(0xFFFA5211),
+                            color: isRead ? subtextColor : const Color(0xFFFA5211),
                             size: 20,
                           ),
                         ),
@@ -277,7 +298,7 @@ class _VendorDashboardState extends State<VendorDashboard> {
                           style: GoogleFonts.outfit(
                             fontSize: 14,
                             fontWeight: isRead ? FontWeight.normal : FontWeight.bold,
-                            color: isRead ? Colors.white54 : Colors.white,
+                            color: isRead ? subtextColor : textColor,
                           ),
                         ),
                         onTap: () {
@@ -300,7 +321,7 @@ class _VendorDashboardState extends State<VendorDashboard> {
                           }
                         },
                         trailing: IconButton(
-                          icon: const Icon(Icons.close, color: Colors.white24, size: 20),
+                          icon: Icon(Icons.close, color: iconDisabledColor, size: 20),
                           onPressed: () {
                             setState(() {
                               _notifications.removeAt(index);
@@ -332,13 +353,17 @@ class _VendorDashboardState extends State<VendorDashboard> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
+    final surfaceColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[100]!;
+    final borderColor = isDark ? Colors.white10 : Colors.black12;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async => await _checkProfileStatus(),
           color: const Color(0xFFFA5211),
-          backgroundColor: const Color(0xFF1E1E1E),
+          backgroundColor: surfaceColor,
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             child: Column(
@@ -457,26 +482,40 @@ class _VendorDashboardState extends State<VendorDashboard> {
   }
 
   Widget _buildNoOrdersPlaceholder(String text) {
-     return Container(
-       width: double.infinity,
-       padding: const EdgeInsets.all(30),
-       decoration: BoxDecoration(
-         color: const Color(0xFF1E1E1E),
-         borderRadius: BorderRadius.circular(25),
-         border: Border.all(color: Colors.white10),
-       ),
-       child: Column(
-         children: [
-           const Icon(Icons.receipt_long_outlined, color: Colors.white10, size: 40),
-           const SizedBox(height: 10),
-           Text(text, style: GoogleFonts.outfit(color: Colors.white24, fontSize: 13)),
-         ],
-       ),
-     );
+    return Builder(
+      builder: (context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final surfaceColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[100]!;
+        final borderColor = isDark ? Colors.white10 : Colors.black12;
+        final iconDisabledColor = isDark ? Colors.white10 : Colors.black12;
+        final textDisabledColor = isDark ? Colors.white24 : Colors.black26;
+        
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(30),
+          decoration: BoxDecoration(
+            color: surfaceColor,
+            borderRadius: BorderRadius.circular(25),
+            border: Border.all(color: borderColor),
+          ),
+          child: Column(
+            children: [
+              Icon(Icons.receipt_long_outlined, color: iconDisabledColor, size: 40),
+              const SizedBox(height: 10),
+              Text(text, style: GoogleFonts.outfit(color: textDisabledColor, fontSize: 13)),
+            ],
+          ),
+        );
+      },
+    );
   }
 
 
   Widget _buildTopHeader(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Row(
@@ -484,14 +523,48 @@ class _VendorDashboardState extends State<VendorDashboard> {
         children: [
           Row(
             children: [
-              const AppLogo(size: 40, showBackground: false),
+              // Business Image
+              StreamBuilder<DocumentSnapshot>(
+                stream: uid != null 
+                  ? FirebaseFirestore.instance.collection('vendors').doc(uid).snapshots()
+                  : null,
+                builder: (context, snapshot) {
+                  String? businessImage;
+                  if (snapshot.hasData && snapshot.data?.data() != null) {
+                    final data = snapshot.data!.data() as Map<String, dynamic>;
+                    businessImage = data['businessImage'] as String?;
+                  }
+                  
+                  return Container(
+                    width: 55,
+                    height: 55,
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF2A2A2A) : Colors.grey[200],
+                      shape: BoxShape.circle,
+                      image: businessImage != null && businessImage.isNotEmpty
+                        ? DecorationImage(
+                            image: NetworkImage(businessImage),
+                            fit: BoxFit.cover,
+                          )
+                        : null,
+                    ),
+                    child: businessImage == null || businessImage.isEmpty
+                      ? Icon(
+                          Icons.store,
+                          color: isDark ? Colors.white38 : Colors.black38,
+                          size: 28,
+                        )
+                      : null,
+                  );
+                },
+              ),
               const SizedBox(width: 12),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'ICuisine',
-                    style: GoogleFonts.outfit(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+                    style: GoogleFonts.outfit(color: textColor, fontSize: 22, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -512,6 +585,11 @@ class _VendorDashboardState extends State<VendorDashboard> {
   }
 
   Widget _buildHeaderIcon(BuildContext context, IconData icon, {String? badge, VoidCallback? onTap}) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final surfaceColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[100]!;
+    final borderColor = isDark ? Colors.white10 : Colors.black12;
+    final iconColor = Theme.of(context).iconTheme.color ?? Colors.black;
+    
     return GestureDetector(
       onTap: onTap,
       child: Stack(
@@ -519,11 +597,11 @@ class _VendorDashboardState extends State<VendorDashboard> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: const Color(0xFF1E1E1E),
+              color: surfaceColor,
               borderRadius: BorderRadius.circular(15),
-              border: Border.all(color: Colors.white10),
+              border: Border.all(color: borderColor),
             ),
-            child: Icon(icon, color: Colors.white, size: 22),
+            child: Icon(icon, color: iconColor, size: 22),
           ),
           if (badge != null)
             Positioned(
@@ -541,18 +619,23 @@ class _VendorDashboardState extends State<VendorDashboard> {
   }
 
   Widget _buildPopupMenu(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final surfaceColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[100]!;
+    final borderColor = isDark ? Colors.white10 : Colors.black12;
+    final iconColor = Theme.of(context).iconTheme.color ?? Colors.black;
+    
     return PopupMenuButton<String>(
       offset: const Offset(0, 50),
-      color: const Color(0xFF1E1E1E),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15), side: const BorderSide(color: Colors.white10)),
+      color: surfaceColor,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15), side: BorderSide(color: borderColor)),
       icon: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: const Color(0xFF1E1E1E),
+          color: surfaceColor,
           borderRadius: BorderRadius.circular(15),
-          border: Border.all(color: Colors.white10),
+          border: Border.all(color: borderColor),
         ),
-        child: const Icon(Icons.account_circle_outlined, color: Colors.white, size: 22),
+        child: Icon(Icons.account_circle_outlined, color: iconColor, size: 22),
       ),
       onSelected: (value) async {
         if (value == 'logout') {
@@ -576,42 +659,54 @@ class _VendorDashboardState extends State<VendorDashboard> {
   PopupMenuItem<String> _buildPopupItem(String value, IconData icon, String text, {Color? color}) {
     return PopupMenuItem(
       value: value,
-      child: Row(
-        children: [
-          Icon(icon, color: color ?? Colors.white70, size: 20),
-          const SizedBox(width: 12),
-          Text(text, style: GoogleFonts.outfit(color: color ?? Colors.white70, fontSize: 14)),
-        ],
+      child: Builder(
+        builder: (context) {
+          final isDark = Theme.of(context).brightness == Brightness.dark;
+          final itemColor = color ?? (isDark ? Colors.white70 : Colors.black54);
+          return Row(
+            children: [
+              Icon(icon, color: itemColor, size: 20),
+              const SizedBox(width: 12),
+              Text(text, style: GoogleFonts.outfit(color: itemColor, fontSize: 14)),
+            ],
+          );
+        },
       ),
     );
   }
 
   Widget _buildProfileWarning() {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 25),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFA5211).withOpacity(0.1),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFFA5211).withOpacity(0.3)),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.warning_amber_rounded, color: Color(0xFFFA5211)),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Profile Incomplete', style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
-                const SizedBox(height: 2),
-                Text(
-                  _notifications.isNotEmpty ? _notifications.first['message'] : 'Update your details to start selling.',
-                  style: GoogleFonts.outfit(color: Colors.white60, fontSize: 12),
-                ),
-              ],
-            ),
+    return Builder(
+      builder: (context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final textColor = Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
+        final subtextColor = isDark ? Colors.white60 : Colors.black54;
+        
+        return Container(
+          margin: const EdgeInsets.only(bottom: 25),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFA5211).withOpacity(0.1),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: const Color(0xFFFA5211).withOpacity(0.3)),
           ),
+          child: Row(
+            children: [
+              const Icon(Icons.warning_amber_rounded, color: Color(0xFFFA5211)),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Profile Incomplete', style: GoogleFonts.outfit(color: textColor, fontWeight: FontWeight.bold, fontSize: 14)),
+                    const SizedBox(height: 2),
+                    Text(
+                      _notifications.isNotEmpty ? _notifications.first['message'] : 'Update your details to start selling.',
+                      style: GoogleFonts.outfit(color: subtextColor, fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
           TextButton(
             onPressed: () {
                Navigator.push(context, MaterialPageRoute(builder: (context) => const VendorProfilePage())).then((_) => _checkProfileStatus());
@@ -621,22 +716,31 @@ class _VendorDashboardState extends State<VendorDashboard> {
         ],
       ),
     );
+      },
+    );
   }
 
   Widget _buildDashboardTitleAction() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return Builder(
+      builder: (context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final textColor = Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
+        final surfaceColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[100]!;
+        final borderColor = isDark ? Colors.white10 : Colors.black12;
+        
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(_getGreeting(), style: GoogleFonts.outfit(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold)),
-          ],
-        ),
-        PopupMenuButton<String>(
-          offset: const Offset(0, 50),
-          color: const Color(0xFF1E1E1E),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15), side: const BorderSide(color: Colors.white10)),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(_getGreeting(), style: GoogleFonts.outfit(color: textColor, fontSize: 26, fontWeight: FontWeight.bold)),
+              ],
+            ),
+            PopupMenuButton<String>(
+              offset: const Offset(0, 50),
+              color: surfaceColor,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15), side: BorderSide(color: borderColor)),
           icon: Container(
             padding: const EdgeInsets.all(10),
             decoration: const BoxDecoration(color: Color(0xFFFA5211), shape: BoxShape.circle),
@@ -657,39 +761,60 @@ class _VendorDashboardState extends State<VendorDashboard> {
             _buildPopupItem('today', Icons.star_outline, 'Today\'s Menu'),
           ],
         ),
-      ],
+          ],
+        );
+      },
     );
   }
 
   Widget _buildSectionHeader(String title, String actionText, VoidCallback onTap) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(title, style: GoogleFonts.outfit(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-        TextButton(
-          onPressed: onTap,
-          child: Row(
-            children: [
-              Text(actionText, style: GoogleFonts.outfit(color: const Color(0xFFFA5211), fontWeight: FontWeight.w600)),
-              const Icon(Icons.chevron_right, color: Color(0xFFFA5211), size: 18),
-            ],
-          ),
-        ),
-      ],
+    return Builder(
+      builder: (context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final textColor = Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
+        
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(title, style: GoogleFonts.outfit(color: textColor, fontSize: 20, fontWeight: FontWeight.bold)),
+            TextButton(
+              onPressed: onTap,
+              child: Row(
+                children: [
+                  Text(actionText, style: GoogleFonts.outfit(color: const Color(0xFFFA5211), fontWeight: FontWeight.w600)),
+                  const Icon(Icons.chevron_right, color: Color(0xFFFA5211), size: 18),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
   Widget _buildSubSectionTitle(String title) {
-    return Text(title, style: GoogleFonts.outfit(color: Colors.white38, fontSize: 15, fontWeight: FontWeight.w600));
+    return Builder(
+      builder: (context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final subtextColor = isDark ? Colors.white38 : Colors.black45;
+        return Text(title, style: GoogleFonts.outfit(color: subtextColor, fontSize: 15, fontWeight: FontWeight.w600));
+      },
+    );
   }
 
   Widget _buildOrderList(List<QueryDocumentSnapshot> orderDocs) {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E),
-        borderRadius: BorderRadius.circular(25),
-        border: Border.all(color: Colors.white10),
-      ),
+    return Builder(
+      builder: (context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final surfaceColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[100]!;
+        final borderColor = isDark ? Colors.white10 : Colors.black12;
+        
+        return Container(
+          decoration: BoxDecoration(
+            color: surfaceColor,
+            borderRadius: BorderRadius.circular(25),
+            border: Border.all(color: borderColor),
+          ),
       child: Column(
         children: orderDocs.asMap().entries.map((entry) {
           final index = entry.key;
@@ -700,6 +825,9 @@ class _VendorDashboardState extends State<VendorDashboard> {
           final Color statusColor = _getStatusColor(status);
           final List items = order['items'] ?? [];
           final String itemsSummary = '${order['customerName'] ?? 'Customer'} • ${items.length} items';
+          final textColor = Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
+          final subtextColor = isDark ? Colors.white38 : Colors.black45;
+          final dividerColor = isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05);
 
           return Column(
             children: [
@@ -710,8 +838,8 @@ class _VendorDashboardState extends State<VendorDashboard> {
                   decoration: BoxDecoration(color: statusColor.withOpacity(0.1), shape: BoxShape.circle),
                   child: Icon(Icons.shopping_bag_outlined, color: statusColor, size: 22),
                 ),
-                title: Text('Order #${doc.id.substring(0, 6).toUpperCase()}', style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold)),
-                subtitle: Text(itemsSummary, style: GoogleFonts.outfit(color: Colors.white38, fontSize: 13)),
+                title: Text('Order #${doc.id.substring(0, 6).toUpperCase()}', style: GoogleFonts.outfit(color: textColor, fontWeight: FontWeight.bold)),
+                subtitle: Text(itemsSummary, style: GoogleFonts.outfit(color: subtextColor, fontSize: 13)),
                 trailing: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -724,11 +852,13 @@ class _VendorDashboardState extends State<VendorDashboard> {
                         style: GoogleFonts.outfit(color: statusColor, fontSize: 11, fontWeight: FontWeight.bold),
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Tap to change',
-                      style: GoogleFonts.outfit(color: const Color(0xFFFA5211), fontSize: 9, fontWeight: FontWeight.w600),
-                    ),
+                    if (status.toLowerCase() != 'delivered' && status.toLowerCase() != 'cancelled') ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        'Tap to change',
+                        style: GoogleFonts.outfit(color: const Color(0xFFFA5211), fontSize: 9, fontWeight: FontWeight.w600),
+                      ),
+                    ],
                   ],
                 ),
                 onTap: () {
@@ -745,18 +875,27 @@ class _VendorDashboardState extends State<VendorDashboard> {
                   }
                 },
               ),
-              if (index < orderDocs.length - 1) Divider(color: Colors.white.withOpacity(0.05), height: 1, indent: 20, endIndent: 20),
+              if (index < orderDocs.length - 1) Divider(color: dividerColor, height: 1, indent: 20, endIndent: 20),
             ],
           );
         }).toList(),
       ),
     );
+      },
+    );
   }
 
   void _showStatusUpdateOptions(String orderId, String currentStatus) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final surfaceColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[100]!;
+    final textColor = Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
+    final subtextColor = isDark ? Colors.white38 : Colors.black45;
+    final borderColor = isDark ? Colors.white10 : Colors.black12;
+    final iconDisabledColor = isDark ? Colors.white10 : Colors.black12;
+    
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF1E1E1E),
+      backgroundColor: surfaceColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
       ),
@@ -769,17 +908,17 @@ class _VendorDashboardState extends State<VendorDashboard> {
             children: [
               Text('Update Order Status',
                   style: GoogleFonts.outfit(
-                      color: Colors.white,
+                      color: textColor,
                       fontSize: 20,
                       fontWeight: FontWeight.bold)),
               const SizedBox(height: 10),
               Text('Order ID: #${orderId.substring(0, 8).toUpperCase()}',
                   style: GoogleFonts.outfit(
-                      color: Colors.white38, fontSize: 13)),
+                      color: subtextColor, fontSize: 13)),
               const SizedBox(height: 25),
               _buildStatusOption(orderId, 'View Full Details',
-                  Icons.visibility_outlined, Colors.white70, isDetails: true),
-              const Divider(color: Colors.white10, height: 30),
+                  Icons.visibility_outlined, isDark ? Colors.white70 : Colors.black54, isDetails: true),
+              Divider(color: borderColor, height: 30),
               if (currentStatus == 'Pending')
                 _buildStatusOption(orderId, 'Received',
                     Icons.check_circle_outline, Colors.orange),
@@ -805,13 +944,19 @@ class _VendorDashboardState extends State<VendorDashboard> {
 
   Widget _buildStatusOption(
       String orderId, String status, IconData icon, Color color, {bool isDetails = false}) {
-    return ListTile(
-      leading: Icon(icon, color: color),
-      title: Text(status,
-          style: GoogleFonts.outfit(
-              color: Colors.white, fontWeight: FontWeight.w600)),
-      trailing:
-          const Icon(Icons.arrow_forward_ios, color: Colors.white10, size: 14),
+    return Builder(
+      builder: (context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final textColor = Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
+        final iconDisabledColor = isDark ? Colors.white10 : Colors.black12;
+        
+        return ListTile(
+          leading: Icon(icon, color: color),
+          title: Text(status,
+              style: GoogleFonts.outfit(
+                  color: textColor, fontWeight: FontWeight.w600)),
+          trailing:
+              Icon(Icons.arrow_forward_ios, color: iconDisabledColor, size: 14),
       onTap: () async {
         Navigator.pop(context);
         
@@ -845,6 +990,8 @@ class _VendorDashboardState extends State<VendorDashboard> {
         }
       },
     );
+      },
+    );
   }
 
   Color _getStatusColor(String status) {
@@ -860,26 +1007,32 @@ class _VendorDashboardState extends State<VendorDashboard> {
   }
 
   void _showCancellationDialog(String orderId) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final surfaceColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[100]!;
+    final textColor = Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
+    final subtextColor = isDark ? Colors.white60 : Colors.black54;
+    final hintColor = isDark ? Colors.white10 : Colors.black26;
+    
     final TextEditingController reasonController = TextEditingController();
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E1E),
-        title: Text('Cancel Order', style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold)),
+        backgroundColor: surfaceColor,
+        title: Text('Cancel Order', style: GoogleFonts.outfit(color: textColor, fontWeight: FontWeight.bold)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Please provide a reason for cancellation:', style: GoogleFonts.outfit(color: Colors.white70, fontSize: 13)),
+            Text('Please provide a reason for cancellation:', style: GoogleFonts.outfit(color: subtextColor, fontSize: 13)),
             const SizedBox(height: 15),
             TextField(
               controller: reasonController,
-              style: const TextStyle(color: Colors.white),
+              style: TextStyle(color: textColor),
               decoration: InputDecoration(
                 hintText: 'e.g. Out of stock, Shop closed',
-                hintStyle: const TextStyle(color: Colors.white24),
+                hintStyle: TextStyle(color: hintColor),
                 filled: true,
-                fillColor: Colors.black26,
+                fillColor: isDark ? Colors.black26 : Colors.white,
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
               ),
               maxLines: 3,
@@ -887,7 +1040,7 @@ class _VendorDashboardState extends State<VendorDashboard> {
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: Text('Back', style: GoogleFonts.outfit(color: Colors.white38))),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text('Back', style: GoogleFonts.outfit(color: subtextColor))),
           ElevatedButton(
             onPressed: () async {
               final reason = reasonController.text.trim();
@@ -924,6 +1077,9 @@ class _VendorDashboardState extends State<VendorDashboard> {
         
         final data = snapshot.data!.data() as Map<String, dynamic>;
         final isLive = data['hasLiveItems'] == true;
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final textColor = Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
+        final subtextColor = isDark ? Colors.white60 : Colors.black54;
         
         return Container(
           padding: const EdgeInsets.all(20),
@@ -956,7 +1112,7 @@ class _VendorDashboardState extends State<VendorDashboard> {
                     Text(
                       isLive ? 'You are LIVE' : 'You are OFFLINE',
                       style: GoogleFonts.outfit(
-                        color: Colors.white,
+                        color: textColor,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
@@ -966,7 +1122,7 @@ class _VendorDashboardState extends State<VendorDashboard> {
                         ? 'Customers can see your menu and place orders.' 
                         : 'Tap "Go Live" to select items and start selling.',
                       style: GoogleFonts.outfit(
-                        color: Colors.white60,
+                        color: subtextColor,
                         fontSize: 12,
                       ),
                     ),

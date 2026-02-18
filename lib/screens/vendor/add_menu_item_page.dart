@@ -20,17 +20,20 @@ class _AddMenuItemPageState extends State<AddMenuItemPage> {
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _priceController = TextEditingController();
+  final _prepTimeController = TextEditingController();
   
   File? _imageFile;
   final ImagePicker _picker = ImagePicker();
   bool _isLoading = false;
   bool _isTodaySpecial = false;
+  String _itemType = 'veg'; // 'veg' or 'non-veg'
 
   @override
   void dispose() {
     _nameController.dispose();
     _descriptionController.dispose();
     _priceController.dispose();
+    _prepTimeController.dispose();
     super.dispose();
   }
 
@@ -98,6 +101,8 @@ class _AddMenuItemPageState extends State<AddMenuItemPage> {
             'price': double.tryParse(_priceController.text.trim()) ?? 0.0,
             'image': imageUrl ?? '',
             'isTodaySpecial': _isTodaySpecial,
+            'itemType': _itemType,
+            'preparationTime': int.tryParse(_prepTimeController.text.trim()) ?? 15,
             'createdAt': FieldValue.serverTimestamp(),
             'isAvailable': true,
           });
@@ -125,16 +130,26 @@ class _AddMenuItemPageState extends State<AddMenuItemPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? const Color(0xFF121212) : Colors.grey[50]!;
+    final textColor = Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
+    final subtextColor = isDark ? Colors.white38 : Colors.black54;
+    final subtextColor2 = isDark ? Colors.white70 : Colors.black54;
+    final surfaceColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[100]!;
+    final borderColor = isDark ? Colors.white10 : Colors.black12;
+    final hintColor = isDark ? Colors.white24 : Colors.black38;
+    final iconDisabledColor = isDark ? Colors.white24 : Colors.black26;
+    
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+      backgroundColor: backgroundColor,
       appBar: AppBar(
         title: Text(
           'Add Menu Item',
-          style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: Colors.white),
+          style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: textColor),
         ),
-        backgroundColor: const Color(0xFF121212),
+        backgroundColor: backgroundColor,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: textColor),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -151,9 +166,9 @@ class _AddMenuItemPageState extends State<AddMenuItemPage> {
                     width: double.infinity,
                     height: 200,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1E1E1E),
+                      color: surfaceColor,
                       borderRadius: BorderRadius.circular(25),
-                      border: Border.all(color: Colors.white10),
+                      border: Border.all(color: borderColor),
                       image: _imageFile != null
                           ? DecorationImage(image: FileImage(_imageFile!), fit: BoxFit.cover)
                           : null,
@@ -162,9 +177,9 @@ class _AddMenuItemPageState extends State<AddMenuItemPage> {
                         ? Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.add_a_photo_outlined, size: 50, color: Colors.white24),
+                              Icon(Icons.add_a_photo_outlined, size: 50, color: iconDisabledColor),
                               const SizedBox(height: 12),
-                              Text('Add Dish Image', style: GoogleFonts.outfit(color: Colors.white38)),
+                              Text('Add Dish Image', style: GoogleFonts.outfit(color: subtextColor)),
                             ],
                           )
                         : null,
@@ -173,31 +188,31 @@ class _AddMenuItemPageState extends State<AddMenuItemPage> {
               ),
               const SizedBox(height: 30),
 
-              _buildLabel('Item Name'),
+              _buildLabel('Item Name', subtextColor2),
               TextFormField(
                 controller: _nameController,
-                style: const TextStyle(color: Colors.white),
-                decoration: _buildInputDecoration('e.g. Paneer Butter Masala', Icons.restaurant),
+                style: TextStyle(color: textColor),
+                decoration: _buildInputDecoration('e.g. Paneer Butter Masala', Icons.restaurant, surfaceColor, borderColor, hintColor),
                 validator: (value) => value == null || value.isEmpty ? 'Please enter item name' : null,
               ),
               const SizedBox(height: 25),
               
-              _buildLabel('Description'),
+              _buildLabel('Description', subtextColor2),
               TextFormField(
                 controller: _descriptionController,
                 maxLines: 3,
-                style: const TextStyle(color: Colors.white),
-                decoration: _buildInputDecoration('Describe your dish...', Icons.description_outlined),
+                style: TextStyle(color: textColor),
+                decoration: _buildInputDecoration('Describe your dish...', Icons.description_outlined, surfaceColor, borderColor, hintColor),
                 validator: (value) => value == null || value.isEmpty ? 'Please enter description' : null,
               ),
               const SizedBox(height: 25),
               
-              _buildLabel('Price (₹)'),
+              _buildLabel('Price (₹)', subtextColor2),
               TextFormField(
                 controller: _priceController,
                 keyboardType: TextInputType.number,
-                style: const TextStyle(color: Colors.white),
-                decoration: _buildInputDecoration('0.00', Icons.currency_rupee),
+                style: TextStyle(color: textColor),
+                decoration: _buildInputDecoration('0.00', Icons.currency_rupee, surfaceColor, borderColor, hintColor),
                 validator: (value) {
                   if (value == null || value.isEmpty) return 'Please enter price';
                   if (double.tryParse(value) == null) return 'Please enter a valid number';
@@ -206,14 +221,146 @@ class _AddMenuItemPageState extends State<AddMenuItemPage> {
               ),
               const SizedBox(height: 25),
 
+              _buildLabel('Preparation Time (minutes)', subtextColor2),
+              TextFormField(
+                controller: _prepTimeController,
+                keyboardType: TextInputType.number,
+                style: TextStyle(color: textColor),
+                decoration: _buildInputDecoration('e.g. 15, 30, 45', Icons.timer_outlined, surfaceColor, borderColor, hintColor),
+                validator: (value) {
+                  if (value == null || value.isEmpty) return 'Please enter preparation time';
+                  if (int.tryParse(value) == null) return 'Please enter a valid number';
+                  if (int.tryParse(value)! <= 0) return 'Time must be greater than 0';
+                  return null;
+                },
+              ),
+              const SizedBox(height: 25),
+
+              // Item Type Selector (Veg/Non-Veg)
+              _buildLabel('Item Type', subtextColor2),
+              Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => setState(() => _itemType = 'veg'),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        decoration: BoxDecoration(
+                          color: _itemType == 'veg' 
+                              ? Colors.green.withOpacity(0.1) 
+                              : surfaceColor,
+                          borderRadius: BorderRadius.circular(15),
+                          border: Border.all(
+                            color: _itemType == 'veg' 
+                                ? Colors.green 
+                                : borderColor,
+                            width: _itemType == 'veg' ? 2 : 1,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.green, width: 2),
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                              child: Center(
+                                child: Container(
+                                  width: 10,
+                                  height: 10,
+                                  decoration: BoxDecoration(
+                                    color: Colors.green,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              'Veg',
+                              style: GoogleFonts.outfit(
+                                color: _itemType == 'veg' ? Colors.green : textColor,
+                                fontWeight: _itemType == 'veg' 
+                                    ? FontWeight.bold 
+                                    : FontWeight.normal,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 15),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => setState(() => _itemType = 'non-veg'),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        decoration: BoxDecoration(
+                          color: _itemType == 'non-veg' 
+                              ? Colors.red.withOpacity(0.1) 
+                              : surfaceColor,
+                          borderRadius: BorderRadius.circular(15),
+                          border: Border.all(
+                            color: _itemType == 'non-veg' 
+                                ? Colors.red 
+                                : borderColor,
+                            width: _itemType == 'non-veg' ? 2 : 1,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.red, width: 2),
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                              child: Center(
+                                child: Container(
+                                  width: 10,
+                                  height: 10,
+                                  decoration: BoxDecoration(
+                                    color: Colors.red,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              'Non-Veg',
+                              style: GoogleFonts.outfit(
+                                color: _itemType == 'non-veg' ? Colors.red : textColor,
+                                fontWeight: _itemType == 'non-veg' 
+                                    ? FontWeight.bold 
+                                    : FontWeight.normal,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 25),
+
               // Today's Special Toggle
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: _isTodaySpecial ? const Color(0xFFFA5211).withOpacity(0.1) : const Color(0xFF1E1E1E),
+                  color: _isTodaySpecial ? const Color(0xFFFA5211).withOpacity(0.1) : surfaceColor,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: _isTodaySpecial ? const Color(0xFFFA5211).withOpacity(0.5) : Colors.white10,
+                    color: _isTodaySpecial ? const Color(0xFFFA5211).withOpacity(0.5) : borderColor,
                   ),
                 ),
                 child: Row(
@@ -223,7 +370,7 @@ class _AddMenuItemPageState extends State<AddMenuItemPage> {
                       children: [
                         Icon(
                           Icons.stars_rounded,
-                          color: _isTodaySpecial ? const Color(0xFFFA5211) : Colors.white38,
+                          color: _isTodaySpecial ? const Color(0xFFFA5211) : subtextColor,
                           size: 28,
                         ),
                         const SizedBox(width: 15),
@@ -232,11 +379,11 @@ class _AddMenuItemPageState extends State<AddMenuItemPage> {
                           children: [
                             Text(
                               'Today\'s Special',
-                              style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 16),
+                              style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: textColor, fontSize: 16),
                             ),
                             Text(
                               'Feature this on today\'s list',
-                              style: GoogleFonts.outfit(fontSize: 12, color: Colors.white38),
+                              style: GoogleFonts.outfit(fontSize: 12, color: subtextColor),
                             ),
                           ],
                         ),
@@ -282,30 +429,30 @@ class _AddMenuItemPageState extends State<AddMenuItemPage> {
     );
   }
 
-  Widget _buildLabel(String text) {
+  Widget _buildLabel(String text, Color color) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10, left: 4),
       child: Text(
         text,
-        style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white70),
+        style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.w600, color: color),
       ),
     );
   }
 
-  InputDecoration _buildInputDecoration(String hint, IconData icon) {
+  InputDecoration _buildInputDecoration(String hint, IconData icon, Color surfaceColor, Color borderColor, Color hintColor) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: GoogleFonts.outfit(color: Colors.white24, fontSize: 14),
+      hintStyle: GoogleFonts.outfit(color: hintColor, fontSize: 14),
       prefixIcon: Icon(icon, color: const Color(0xFFFA5211), size: 20),
       filled: true,
-      fillColor: const Color(0xFF1E1E1E),
+      fillColor: surfaceColor,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(15),
-        borderSide: const BorderSide(color: Colors.white10),
+        borderSide: BorderSide(color: borderColor),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(15),
-        borderSide: const BorderSide(color: Colors.white10),
+        borderSide: BorderSide(color: borderColor),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(15),

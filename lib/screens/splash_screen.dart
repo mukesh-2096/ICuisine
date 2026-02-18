@@ -53,7 +53,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFA5211),
+      backgroundColor: const Color(0xFFFC3F02),
       body: Center(
         child: FadeTransition(
           opacity: _fadeAnimation,
@@ -62,22 +62,14 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Logo with subtle background circle
-                Container(
-                  width: 180,
-                  height: 180,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white.withOpacity(0.1),
-                  ),
-                  padding: const EdgeInsets.all(35),
-                  child: Image.asset(
-                    'images/logo.png',
-                    color: Colors.white,
-                    fit: BoxFit.contain,
-                  ),
+                // White logo
+                Image.asset(
+                  'images/white_logo.png',
+                  width: 280,
+                  height: 280,
+                  fit: BoxFit.contain,
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 32),
                 // Text
                 Text(
                   'ICuisine',

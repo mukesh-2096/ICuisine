@@ -109,13 +109,23 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? const Color(0xFF121212) : Colors.grey[50]!;
+    final textColor = Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
+    final subtextColor = isDark ? Colors.white38 : Colors.black54;
+    final hintColor = isDark ? Colors.white24 : Colors.black26;
+    final iconBackground = isDark ? Colors.white10 : Colors.black12;
+    final surfaceColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[100]!;
+    final borderColor = isDark ? Colors.white10 : Colors.black12;
+    final surfaceIconColor = isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05);
+    
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+      backgroundColor: backgroundColor,
       appBar: AppBar(
-        title: Text('Account Settings', style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold)),
-        backgroundColor: const Color(0xFF121212),
+        title: Text('Account Settings', style: GoogleFonts.outfit(color: textColor, fontWeight: FontWeight.bold)),
+        backgroundColor: backgroundColor,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: textColor),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator(color: Color(0xFFFA5211)))
@@ -134,7 +144,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                           height: 120,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: const Color(0xFF1E1E1E),
+                            color: surfaceColor,
                             border: Border.all(color: const Color(0xFFFA5211), width: 2),
                           ),
                           child: ClipOval(
@@ -142,7 +152,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                                 ? Image.file(_imageFile!, fit: BoxFit.cover)
                                 : (_profileImageUrl != null && _profileImageUrl!.isNotEmpty
                                     ? Image.network(_profileImageUrl!, fit: BoxFit.cover)
-                                    : const Icon(Icons.person, size: 60, color: Colors.white10)),
+                                    : Icon(Icons.person, size: 60, color: iconBackground)),
                           ),
                         ),
                         GestureDetector(
@@ -158,11 +168,11 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                     const SizedBox(height: 40),
 
                     // User Details
-                    _buildDisabledField('Email (Fixed)', _email ?? 'Loading...', Icons.email_outlined),
+                    _buildDisabledField('Email (Fixed)', _email ?? 'Loading...', Icons.email_outlined, surfaceIconColor, borderColor, hintColor, subtextColor),
                     const SizedBox(height: 20),
-                    _buildTextField('Full Name', _nameController, Icons.person_outline),
+                    _buildTextField('Full Name', _nameController, Icons.person_outline, textColor, subtextColor, surfaceColor, borderColor),
                     const SizedBox(height: 20),
-                    _buildTextField('Mobile Number', _phoneController, Icons.phone_android_outlined, keyboardType: TextInputType.phone),
+                    _buildTextField('Mobile Number', _phoneController, Icons.phone_android_outlined, textColor, subtextColor, surfaceColor, borderColor, keyboardType: TextInputType.phone),
                     const SizedBox(height: 40),
 
                     // Save Button
@@ -188,24 +198,24 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
     );
   }
 
-  Widget _buildDisabledField(String label, String value, IconData icon) {
+  Widget _buildDisabledField(String label, String value, IconData icon, Color surfaceIconColor, Color borderColor, Color hintColor, Color subtextColor) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: surfaceIconColor,
         borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: Colors.white10),
+        border: Border.all(color: borderColor),
       ),
       child: Row(
         children: [
-          Icon(icon, color: Colors.white24, size: 22),
+          Icon(icon, color: hintColor, size: 22),
           const SizedBox(width: 15),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: GoogleFonts.outfit(color: Colors.white24, fontSize: 12)),
+              Text(label, style: GoogleFonts.outfit(color: hintColor, fontSize: 12)),
               const SizedBox(height: 4),
-              Text(value, style: GoogleFonts.outfit(color: Colors.white38, fontSize: 15)),
+              Text(value, style: GoogleFonts.outfit(color: subtextColor, fontSize: 15)),
             ],
           ),
         ],
@@ -213,20 +223,20 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller, IconData icon, {TextInputType? keyboardType, int maxLines = 1, bool isRequired = true}) {
+  Widget _buildTextField(String label, TextEditingController controller, IconData icon, Color textColor, Color subtextColor, Color surfaceColor, Color borderColor, {TextInputType? keyboardType, int maxLines = 1, bool isRequired = true}) {
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
       maxLines: maxLines,
-      style: GoogleFonts.outfit(color: Colors.white),
+      style: GoogleFonts.outfit(color: textColor),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: GoogleFonts.outfit(color: Colors.white38),
+        labelStyle: GoogleFonts.outfit(color: subtextColor),
         prefixIcon: Icon(icon, color: const Color(0xFFFA5211)),
         filled: true,
-        fillColor: const Color(0xFF1E1E1E),
+        fillColor: surfaceColor,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Colors.white10)),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide(color: borderColor)),
         focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Color(0xFFFA5211))),
       ),
       validator: (value) {
